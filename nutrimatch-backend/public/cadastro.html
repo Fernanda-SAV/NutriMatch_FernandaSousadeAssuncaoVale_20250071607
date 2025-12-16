@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Cadastro</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="container">
+    <nav>
+      <a class="brand" href="index.html">
+        <img src="images/logo.png" alt="Logo NutriMatch">
+        <strong>NutriMatch</strong>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="login.html">Entrar</a>
+        <a href="cadastro.html">Cadastrar</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container hero">
+    <div class="card">
+      <h2>Cadastrar</h2>
+
+      <form class="form-vertical" method="POST" action="/cadastro">
+
+        <!-- TIPO DE CONTA NO TOPO -->
+        <div class="tipo-conta-box">
+          <label class="titulo-tipo">Tipo de conta</label>
+
+          <label class="radio-opcao">
+            <input type="radio" name="tipo" value="paciente" checked onclick="toggleCamposTipo()">
+            <span>Paciente</span>
+          </label>
+
+          <label class="radio-opcao">
+            <input type="radio" name="tipo" value="nutricionista" onclick="toggleCamposTipo()">
+            <span>Nutricionista</span>
+          </label>
+        </div>
+
+        <div class="campo">
+          <label>Nome completo</label>
+          <input name="nome" placeholder="Seu nome completo" required>
+        </div>
+
+        <div class="campo">
+          <label>E-mail</label>
+          <input type="email" name="email" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="campo">
+          <label>Senha</label>
+          <input
+            type="password"
+            name="senha"
+            placeholder="Crie uma senha segura"
+            minlength="6"
+            pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,}"
+            title="A senha deve ter pelo menos 6 caracteres, incluindo número, letra maiúscula, letra minúscula e caractere especial."
+            required
+          >
+          <small class="hint-senha">
+            Mínimo 6 caracteres com número, maiúscula, minúscula e símbolo.
+          </small>
+        </div>
+
+        <div class="campo">
+          <label>Data de nascimento</label>
+          <input type="date" name="nascimento" required>
+        </div>
+
+        <div class="campo">
+          <label>Telefone</label>
+          <input type="tel" name="telefone" placeholder="(DDD) 9 0000-0000" required>
+        </div>
+
+        <div class="campo">
+          <label>Sexo</label>
+          <select name="sexo" required>
+            <option value="feminino">Feminino</option>
+            <option value="masculino">Masculino</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <!-- CAMPOS EXTRAS PARA PACIENTE -->
+        <div id="dados-paciente">
+
+          <div class="campo">
+            <label>Peso (kg)</label>
+            <input type="number" name="peso" min="1" placeholder="Ex: 68">
+          </div>
+
+          <div class="campo">
+            <label>Altura (cm)</label>
+            <input type="number" name="altura" min="50" placeholder="Ex: 165">
+          </div>
+
+          <!-- meta_kcal_diaria REMOVIDA A PEDIDO -->
+
+        </div>
+
+        <!-- CAMPOS EXTRAS PARA NUTRICIONISTA -->
+        <div id="dados-nutri" style="display:none">
+
+          <div class="campo">
+            <label>CRN</label>
+            <input
+              type="text"
+              name="crn"
+              placeholder="Ex: CRN-11 12345"
+            >
+          </div>
+
+        </div>
+
+        <button class="btn" type="submit">Criar conta</button>
+      </form>
+
+      <script>
+        function toggleCamposTipo() {
+          const pacienteChecked = document.querySelector('input[name="tipo"][value="paciente"]').checked;
+          const divPaciente = document.getElementById("dados-paciente");
+          const divNutri = document.getElementById("dados-nutri");
+
+          if (pacienteChecked) {
+            divPaciente.style.display = "block";
+            divNutri.style.display = "none";
+          } else {
+            divPaciente.style.display = "none";
+            divNutri.style.display = "block";
+          }
+        }
+
+        // garantir estado inicial correto ao carregar a página
+        window.addEventListener("DOMContentLoaded", toggleCamposTipo);
+      </script>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+</footer>
+
+<script src="js/app.js"></script>
+
+
+</body>
+</html>
+

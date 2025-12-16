@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Dashboard Nutricionista</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a class="brand" href="dashboard_nutri.html">
+          <img src="images/logo.png" alt="Logo NutriMatch">
+          <strong>NutriMatch</strong>
+        </a>
+        <div class="nav-links">
+          <a href="dashboard_nutri.html">Meus pacientes</a>
+          <a href="paciente.html">Paciente</a>
+          <a href="editar_pacientes.html">Editar pacientes</a>
+          <a href="index.html">Sair</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+  <div class="container">
+
+    <div class="top-actions">
+      <button
+        type="button"
+        class="btn outline btn-back"
+        onclick="window.history.back()"
+      >
+        ← Voltar
+      </button>
+    </div>
+
+      <!-- BLOCO NOVO: VINCULAR PACIENTE AO NUTRICIONISTA -->
+      <section class="card" style="margin-bottom:1.5rem;">
+        <h2>Vincular novo paciente</h2>
+        <p class="small">
+          Para acompanhar um paciente no NutriMatch, ele precisa ter uma conta cadastrada como
+          <strong>paciente</strong>. Peça ao paciente o e-mail de acesso e use o campo abaixo para vinculá-lo
+          à sua lista. Depois do vínculo, você poderá cadastrar o plano alimentar e registrar a evolução das
+          medidas corporais a cada consulta.
+        </p>
+
+        <form class="form-vertical" method="POST" action="/vincular-paciente">
+          <div class="campo">
+            <label for="email_paciente">E-mail do paciente cadastrado no NutriMatch</label>
+            <input
+              id="email_paciente"
+              name="email_paciente"
+              type="email"
+              placeholder="paciente@exemplo.com"
+              required>
+          </div>
+
+          <!-- No sistema real, esse botão acionaria a rota /vincular-paciente no backend -->
+          <button class="btn" type="submit">Vincular paciente</button>
+        </form>
+
+        <p class="small" style="margin-top:.6rem;">
+          Em uma versão completa, o sistema verificaria se o e-mail existe, se pertence a um usuário do tipo
+          paciente e, se estiver tudo certo, criaria/atualizaria o vínculo entre você e o paciente na base
+          de dados.
+        </p>
+      </section>
+
+      <!-- LISTA DE PACIENTES JÁ VINCULADOS -->
+      <section>
+        <h2>Meus pacientes</h2>
+
+        <div class="actions" style="margin-bottom:.8rem">
+          <a class="btn outline" href="editar_pacientes.html">Editar pacientes</a>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>João Silva</h3>
+            <p class="small">
+              Meta diária: 1.800 kcal • Plano ativo: Semanal A<br>
+              Última consulta: 05/12/2025 • Próximo retorno: 20/12/2025
+            </p>
+            <div class="actions">
+              <a class="btn" href="paciente.html">Ver plano, medidas e substituições</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Maria Santos</h3>
+            <p class="small">
+              Meta diária: 1.600 kcal • Plano ativo: Cutting<br>
+              Última consulta: 02/12/2025 • Próximo retorno: 17/12/2025
+            </p>
+            <div class="actions">
+              <a class="btn" href="paciente.html">Ver plano, medidas e substituições</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+  </footer>
+
+<script src="js/app.js"></script>
+
+
+</body>
+</html>
+

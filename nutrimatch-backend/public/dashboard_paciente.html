@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Meu Plano</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="login-header">
+    <div class="container">
+      <nav>
+        <a class="brand" href="dashboard_paciente.html">
+          <img src="images/logo.png" alt="Logo NutriMatch">
+          <strong>NutriMatch</strong>
+        </a>
+        <div class="nav-links">
+          <a href="dashboard_paciente.html">Plano</a>
+          <a href="listagem_sugestoes.html">Sugestões</a>
+          <a href="detalhe_receita.html">Receita</a>
+          <!-- Sair aciona a rota de logout para encerrar a sessão -->
+          <a href="/logout">Sair</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+  <div class="container">
+
+    <div class="top-actions">
+      <button
+        type="button"
+        class="btn outline btn-back"
+        onclick="window.history.back()"
+      >
+        ← Voltar
+      </button>
+    </div>
+
+      <!-- RESUMO DO PLANO -->
+      <section class="card">
+        <h2>Meu plano de hoje</h2>
+        <p class="small">
+          Plano cadastrado pela nutricionista, com 3 opções de receita por refeição na mesma faixa de calorias.
+          Selecione a opção que você seguiu e confirme a refeição. Caso não tenha os ingredientes, use o botão
+          <strong>Substituir</strong> para buscar alternativas.
+        </p>
+      </section>
+
+      <!-- REFEIÇÕES DO DIA -->
+      <section class="grid grid-3">
+
+        <!-- CAFÉ DA MANHÃ -->
+        <div class="meal">
+          <h3>Café da manhã • 350 kcal</h3>
+          <div class="recipes">
+            <label class="recipe-option">
+              <input type="radio" name="ref_cafe_manha" value="iogurte_granola">
+              <div class="recipe">
+                <strong>Iogurte + granola</strong>
+                <p class="small">Iogurte 170 g + granola 30 g</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_cafe_manha" value="omelete_simples">
+              <div class="recipe">
+                <strong>Omelete simples</strong>
+                <p class="small">2 ovos + tomate</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_cafe_manha" value="vitamina_banana">
+              <div class="recipe">
+                <strong>Vitamina de banana</strong>
+                <p class="small">Leite 200 ml + banana</p>
+              </div>
+            </label>
+          </div>
+          <div class="actions">
+            <a class="btn" href="confirmacao.html">Confirmar refeição</a>
+            <a class="btn outline" href="listagem_sugestoes.html">Substituir</a>
+          </div>
+        </div>
+
+        <!-- LANCHE DA MANHÃ -->
+        <div class="meal">
+          <h3>Lanche da manhã • 150 kcal</h3>
+          <div class="recipes">
+            <label class="recipe-option">
+              <input type="radio" name="ref_lanche_manha" value="banana">
+              <div class="recipe">
+                <strong>Banana</strong>
+                <p class="small">1 unidade média</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_lanche_manha" value="mix_castanhas">
+              <div class="recipe">
+                <strong>Mix de castanhas</strong>
+                <p class="small">20 g</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_lanche_manha" value="biscoito_agua">
+              <div class="recipe">
+                <strong>Biscoito água</strong>
+                <p class="small">4 unidades</p>
+              </div>
+            </label>
+          </div>
+          <div class="actions">
+            <a class="btn" href="confirmacao.html">Confirmar refeição</a>
+            <a class="btn outline" href="listagem_sugestoes.html">Substituir</a>
+          </div>
+        </div>
+
+        <!-- ALMOÇO -->
+        <div class="meal">
+          <h3>Almoço • 600 kcal</h3>
+          <div class="recipes">
+            <label class="recipe-option">
+              <input type="radio" name="ref_almoco" value="frango_arroz_salada">
+              <div class="recipe">
+                <strong>Frango + arroz + salada</strong>
+                <p class="small">Peito de frango grelhado, arroz branco e salada variada</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_almoco" value="carne_pure">
+              <div class="recipe">
+                <strong>Carne moída + purê</strong>
+                <p class="small">Carne moída magra + purê de batata</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_almoco" value="peixe_batata">
+              <div class="recipe">
+                <strong>Peixe + batata</strong>
+                <p class="small">Filé de peixe assado + batata cozida</p>
+              </div>
+            </label>
+          </div>
+          <div class="actions">
+            <a class="btn" href="confirmacao.html">Confirmar refeição</a>
+            <a class="btn outline" href="listagem_sugestoes.html">Substituir</a>
+          </div>
+        </div>
+
+        <!-- LANCHE DA TARDE -->
+        <div class="meal">
+          <h3>Lanche da tarde • 170 kcal</h3>
+          <div class="recipes">
+            <label class="recipe-option">
+              <input type="radio" name="ref_lanche_tarde" value="panqueca_banana">
+              <div class="recipe">
+                <strong>Panqueca de banana</strong>
+                <p class="small">Banana, ovo, aveia</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_lanche_tarde" value="mingau_rapido">
+              <div class="recipe">
+                <strong>Mingau rápido</strong>
+                <p class="small">Aveia + leite + canela</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_lanche_tarde" value="maca_amendoim">
+              <div class="recipe">
+                <strong>Maçã + amendoim</strong>
+                <p class="small">1 maçã pequena + 1 colher (sopa) de pasta de amendoim</p>
+              </div>
+            </label>
+          </div>
+          <div class="actions">
+            <a class="btn" href="confirmacao.html">Confirmar refeição</a>
+            <a class="btn outline" href="listagem_sugestoes.html">Substituir</a>
+          </div>
+        </div>
+
+        <!-- JANTAR -->
+        <div class="meal">
+          <h3>Jantar • 500 kcal</h3>
+          <div class="recipes">
+            <label class="recipe-option">
+              <input type="radio" name="ref_jantar" value="frango_legumes">
+              <div class="recipe">
+                <strong>Frango grelhado + legumes</strong>
+                <p class="small">Frango grelhado + legumes no vapor</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_jantar" value="macarrao_integral">
+              <div class="recipe">
+                <strong>Macarrão integral + molho</strong>
+                <p class="small">Macarrão integral com molho de tomate caseiro</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_jantar" value="omelete_completa">
+              <div class="recipe">
+                <strong>Omelete completa</strong>
+                <p class="small">Ovos, legumes, queijo branco</p>
+              </div>
+            </label>
+          </div>
+          <div class="actions">
+            <a class="btn" href="confirmacao.html">Confirmar refeição</a>
+            <a class="btn outline" href="listagem_sugestoes.html">Substituir</a>
+          </div>
+        </div>
+
+        <!-- CEIA -->
+        <div class="meal">
+          <h3>Ceia (opcional) • 120 kcal</h3>
+          <div class="recipes">
+            <label class="recipe-option">
+              <input type="radio" name="ref_ceia" value="leite_morno">
+              <div class="recipe">
+                <strong>Leite morno</strong>
+                <p class="small">Leite desnatado 150 ml</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_ceia" value="iogurte_natural">
+              <div class="recipe">
+                <strong>Iogurte natural</strong>
+                <p class="small">Iogurte natural desnatado</p>
+              </div>
+            </label>
+
+            <label class="recipe-option">
+              <input type="radio" name="ref_ceia" value="cha_torrada">
+              <div class="recipe">
+                <strong>Chá + torradinha</strong>
+                <p class="small">Chá sem açúcar + 1 torrada</p>
+              </div>
+            </label>
+          </div>
+          <div class="actions">
+            <a class="btn" href="confirmacao.html">Confirmar refeição</a>
+            <a class="btn outline" href="listagem_sugestoes.html">Substituir</a>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- DIÁRIO ALIMENTAR (VISÃO PARA NUTRICIONISTA) -->
+      <section class="card" id="diario-alimentar" style="margin-top:2rem;">
+        <h2>Diário alimentar</h2>
+        <p class="small">
+          As refeições confirmadas pelo paciente ao longo dos dias aparecem aqui para o nutricionista acompanhar
+          a adesão ao plano alimentar.
+        </p>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Refeição</th>
+              <th>Receita escolhida</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Exemplo estático para o protótipo -->
+            <tr>
+              <td>10/12/2025</td>
+              <td>Café da manhã</td>
+              <td>Vitamina de banana</td>
+              <td>Confirmada</td>
+            </tr>
+            <tr>
+              <td>10/12/2025</td>
+              <td>Almoço</td>
+              <td>Frango + arroz + salada</td>
+              <td>Confirmada</td>
+            </tr>
+            <tr>
+              <td>09/12/2025</td>
+              <td>Lanche da tarde</td>
+              <td>Panqueca de banana</td>
+              <td>Confirmada</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+  </footer>
+  <!-- Script centralizado para funcionalidades dinâmicas (futuro) -->
+  <script src="js/app.js"></script>
+</body>
+</html>

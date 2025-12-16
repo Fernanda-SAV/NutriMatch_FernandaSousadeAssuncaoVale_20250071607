@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Editar Pacientes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="login-header">
+    <div class="container">
+      <nav>
+        <a class="brand" href="dashboard_nutri.html">
+          <img src="images/logo.png" alt="Logo NutriMatch">
+          <strong>NutriMatch</strong>
+        </a>
+        <div class="nav-links">
+          <a href="dashboard_nutri.html">Meus pacientes</a>
+          <a href="gestao_paciente.html">Gestão do paciente</a>
+          <a href="editar_pacientes.html">Editar pacientes</a>
+          <!-- Sair via rota de logout -->
+          <a href="/logout">Sair</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+  <div class="container">
+
+    <div class="top-actions">
+      <button
+        type="button"
+        class="btn outline btn-back"
+        onclick="window.history.back()"
+      >
+        ← Voltar
+      </button>
+    </div>
+
+      <!-- BUSCAR / FILTRAR PACIENTE -->
+      <section class="card">
+        <h2>Editar pacientes</h2>
+        <p class="small">
+          Use esta página para localizar pacientes vinculados e acessar a tela de gestão completa.
+          Na gestão do paciente você poderá editar dados cadastrais, meta calórica, plano alimentar
+          e acompanhar o diário alimentar.
+        </p>
+
+        <form class="inline" onsubmit="return false">
+          <input placeholder="Buscar por nome ou e-mail do paciente">
+          <a class="btn" href="#lista-pacientes">Buscar</a>
+        </form>
+      </section>
+
+      <!-- LISTA DE PACIENTES VINCULADOS -->
+      <section class="card" id="lista-pacientes" style="margin-top:1.5rem;">
+        <h3>Pacientes vinculados</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Meta diária (kcal)</th>
+              <th>Plano atual</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="pacientes-tbody">
+            <tr>
+              <td colspan="4">Carregando pacientes...</td>
+            </tr>
+          </tbody>
+
+        </table>
+
+        <p class="small">
+          Em uma implementação completa, cada linha estaria ligada a um <em>paciente_id</em> e o botão
+          <strong>Ver / editar</strong> abriria a gestão do paciente correto, por exemplo:
+          <code>gestao_paciente.html?id=12</code>.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+  </footer>
+  <!-- Carrega o script centralizado para listar pacientes dinamicamente -->
+  <script src="js/app.js"></script>
+
+
+  <script>
+    async function carregarPacientes() {
+      const tbody = document.getElementById('pacientes-tbody');
+      tbody.innerHTML = '<tr><td colspan="4">Carregando pacientes...</td></tr>';
+
+      try {
+        const resp = await fetch('/api/pacientes');
+        if (!resp.ok) throw new Error('Erro ao buscar pacientes');
+
+        const pacientes = await resp.json();
+
+        if (!pacientes.length) {
+          tbody.innerHTML = '<tr><td colspan="4">Nenhum paciente vinculado.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+
+        pacientes.forEach(p => {
+          const tr = document.createElement('tr');
+
+          tr.innerHTML = `
+            <td>
+              ${p.nome}<br>
+              <span class="small">${p.email}</span>
+            </td>
+            <td>${p.meta_kcal_diaria ?? '-'}</td>
+            <td>-</td>
+            <td>
+              <a class="btn" href="gestao_paciente.html?paciente_id=${p.paciente_id}">
+                Ver / editar
+              </a>
+              <button
+                type="button"
+                class="btn outline btn-desvincular"
+                data-id="${p.paciente_id}"
+              >
+                Excluir vínculo
+              </button>
+            </td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+
+        // Liga os cliques dos botões "Excluir vínculo"
+        document.querySelectorAll('.btn-desvincular').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+
+            if (!confirm('Deseja realmente excluir o vínculo com este paciente?')) {
+              return;
+            }
+
+            try {
+              const resp = await fetch(`/api/pacientes/${id}/desvincular`, {
+                method: 'POST'
+              });
+
+              if (!resp.ok) {
+                const erro = await resp.json().catch(() => ({}));
+                alert(erro.mensagem || 'Erro ao excluir vínculo.');
+                return;
+              }
+
+              // Recarrega a lista após excluir
+              await carregarPacientes();
+            } catch (err) {
+              console.error(err);
+              alert('Erro de comunicação com o servidor.');
+            }
+          });
+        });
+
+      } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="4">Erro ao carregar pacientes.</td></tr>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarPacientes);
+  </script>
+
+
+</body>
+</html>

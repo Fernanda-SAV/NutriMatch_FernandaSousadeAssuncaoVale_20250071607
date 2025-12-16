@@ -1,0 +1,166 @@
+:root{
+  --accent-blue:#1A75BB;
+  --accent-green:#6BC24A;
+  --accent-orange:#F45C2C;
+  --accent-purple:#A340A2;
+  --bg:#ffffff;
+  --bg-2:#f9f9f9;
+  --text:#1A1A1A;
+  --muted:#666666;
+  --stroke:#E6EBF1;
+  --shadow:0 18px 40px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.container{max-width:1140px;margin:0 auto;padding:1rem}
+header{background:linear-gradient(90deg, var(--accent-purple) 0%, var(--accent-orange) 100%);color:#fff}
+/* Estilo personalizado para o cabeçalho da página inicial (home) */
+.home-header {
+  /* Usa um fundo rosa bem claro para combinar melhor com a identidade da marca */
+  background: #fbe8f5;
+  color: var(--text);
+}
+/* Aumenta o tamanho e a cor do nome da marca no cabeçalho da home */
+.home-header .brand strong {
+  font-size: 2rem;
+  color: var(--accent-purple);
+}
+/* Centraliza o conteúdo de navegação na página inicial */
+.home-header nav {
+  justify-content: center;
+}
+
+/* Estilos para o cabeçalho das páginas de login (nutricionista e paciente) */
+.login-header {
+  /* Fundo rosa claro para harmonia com a marca */
+  background: #fbe8f5;
+  color: var(--text);
+}
+.login-header nav {
+  /* Mantém a distribuição padrão entre logo e botão de voltar */
+  justify-content: space-between;
+  align-items: center;
+}
+.login-header .brand strong {
+  /* Destaca o nome da marca com cor roxa e tamanho ampliado */
+  color: var(--accent-purple);
+  font-size: 1.8rem;
+}
+.login-header .brand img {
+  /* Aumenta a logo um pouco nos formulários de login */
+  height: 140px;
+}
+.login-header .btn.outline {
+  /* Estilo de botão de voltar compatível com o fundo rosa */
+  border: 1.5px solid var(--accent-purple);
+  color: var(--accent-purple);
+  background: transparent;
+}
+.login-header .btn.outline:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/*
+ * Quando o cabeçalho estiver usando a classe `login-header` (aplicada nas
+ * páginas internas do sistema), o fundo é claro e os links de navegação
+ * precisam ter cores escuras para garantir contraste. Por padrão, os
+ * links dentro de `.nav-links` são brancos, pois herdam o estilo do
+ * cabeçalho com degradê. As regras abaixo sobrescrevem essas cores
+ * somente quando o cabeçalho tem a classe `login-header`.
+ */
+.login-header .nav-links a {
+  /* Links escuros no fundo claro */
+  color: var(--accent-purple);
+  background: transparent;
+}
+.login-header .nav-links a:hover {
+  /* Leve sombreamento ao passar o mouse */
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--accent-purple);
+}
+
+/* Aumenta o tamanho da logo na página inicial */
+.home-header .brand img {
+  height: 160px;
+}
+nav{display:flex;gap:1rem;align-items:center;justify-content:space-between;padding:1.1rem 0}
+.brand{display:flex;align-items:center;gap:.6rem}
+.brand img{height:110px;vertical-align:middle}
+.brand strong{letter-spacing:.3px;color:#fff}
+.nav-links a{padding:.6rem .9rem;border-radius:10px;color:#fff;font-weight:600;text-decoration:none}
+.nav-links a:hover{background:rgba(255,255,255,.18)}
+.hero{padding:3rem 0}
+.grid{display:grid;gap:1rem}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.card{background:#fff;border:1px solid var(--stroke);border-radius:18px;padding:1.2rem 1.4rem;box-shadow:var(--shadow)}
+
+.info-box {
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-top: 1rem;
+  background: #ffffff;        /* fundo liso, sem degradê */
+  color: var(--text);         /* texto escuro para ficar legível */
+}
+
+/* garante que o texto menor dentro do box também fique escuro */
+.info-box .small {
+  color: var(--text);
+}
+
+
+h1{font-size:clamp(2rem,3vw,2.8rem);margin:.2rem 0 .8rem}
+h2{font-size:1.4rem;margin:.2rem 0 1rem}
+h3{margin:.2rem 0 .6rem;color:var(--accent-blue)}
+p.small{color:#666;margin:.4rem 0}
+a.btn{display:inline-block}
+.btn{background:linear-gradient(90deg, var(--accent-green) 0%, var(--accent-blue) 100%);color:#fff;font-weight:700;border:none;border-radius:14px;padding:.85rem 1.1rem;box-shadow:0 10px 20px rgba(26,117,187,.20);text-decoration:none}
+.btn.outline{background:transparent;color:var(--accent-green);border:1.5px solid var(--accent-green)}
+.btn.link{background:transparent;color:var(--accent-blue);padding:0}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--stroke);padding:.7rem .5rem;text-align:left}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.kpi{padding:1rem;border:1px dashed var(--stroke);border-radius:16px}
+.kpi strong{font-size:1.4rem}
+.meal{border:1px solid var(--stroke);border-radius:16px;padding:1rem}
+.meal h3{margin:0 0 .4rem}
+.recipes{display:grid;gap:.6rem}
+.recipe{border:1px solid var(--stroke);border-radius:12px;padding:.6rem}
+.actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem}
+form.inline{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+input,select{padding:.7rem .8rem;border-radius:10px;border:1px solid var(--stroke);background:#fff;color:#1A1A1A}
+.footer{background:var(--bg-2);color:#666;border-top:3px solid rgba(107,194,74,.35);padding:1.2rem 0;margin-top:2rem}
+.slogan{font-size:clamp(1.2rem,2.2vw,1.6rem);color:#333;margin:.2rem 0 1.2rem}
+.hero-cta{display:flex;gap:.6rem;flex-wrap:wrap}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0 1rem}
+.tab{padding:.45rem .7rem;border-radius:999px;border:1px solid var(--stroke);background:#f5f7fb;color:#1A75BB;font-weight:600;text-decoration:none}
+.tab.active{background:#E9F7EE;border-color:#cfead6;color:#2c7e1f}
+.section-title{margin-top:1.2rem;border-top:1px solid var(--stroke);padding-top:.8rem}
+@media(max-width:860px){.grid-2,.grid-3{grid-template-columns:1fr}.brand img{height:84px}}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: white;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  display: inline-block;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.15);
+}
+
+.link-secundario {
+  font-size: 0.95rem;
+  color: var(--accent-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-secundario:hover {
+  color: var(--accent-green);
+}

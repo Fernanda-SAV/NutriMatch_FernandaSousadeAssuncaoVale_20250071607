@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Lista de Receitas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Cabeçalho com fundo claro para as páginas internas -->
+<header class="login-header">
+  <div class="container">
+    <nav>
+      <!-- Link da marca leva ao dashboard do nutricionista -->
+      <a class="brand" href="dashboard_nutri.html">
+        <img src="images/logo.png" alt="Logo NutriMatch">
+        <strong>NutriMatch</strong>
+      </a>
+      <!-- Navegação ajustada usando div em vez de lista -->
+      <div class="nav-links">
+        <a href="dashboard_nutri.html">Dashboard</a>
+        <a href="lista_receitas.html">Receitas</a>
+        <a href="cadastrar_receita.html">Nova receita</a>
+        <!-- Sair deve usar a rota de logout do servidor -->
+        <a href="/logout">Sair</a>
+      </div>
+    </nav>
+  </div>
+</header>
+<main>
+  <div class="container">
+
+    <div class="top-actions">
+      <button
+        type="button"
+        class="btn outline btn-back"
+        onclick="window.history.back()"
+      >
+        ← Voltar
+      </button>
+    </div>
+    <h2>Receitas cadastradas</h2>
+    <p class="small">Abaixo você encontra todas as receitas cadastradas no sistema. Clique no nome de uma receita para ver mais detalhes.</p>
+    <table class="table" id="tabela-receitas">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Calorias (kcal)</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Receitas serão inseridas aqui via JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</main>
+<footer class="footer">
+  <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+</footer>
+<script src="js/app.js"></script>
+<script>
+  // Busca a lista de receitas do backend e preenche a tabela
+  document.addEventListener('DOMContentLoaded', () => {
+    fetch('/api/receitas')
+      .then(resp => {
+        if (!resp.ok) {
+          throw new Error('Erro ao carregar receitas');
+        }
+        return resp.json();
+      })
+      .then(receitas => {
+        const tbody = document.querySelector('#tabela-receitas tbody');
+        receitas.forEach(r => {
+          const tr = document.createElement('tr');
+          const nomeTd = document.createElement('td');
+          const link = document.createElement('a');
+          link.href = `detalhe_receita.html?id=${r.id}`;
+          link.textContent = r.nome;
+          nomeTd.appendChild(link);
+          tr.appendChild(nomeTd);
+
+          const kcalTd = document.createElement('td');
+          kcalTd.textContent = r.kcal_total || '';
+          tr.appendChild(kcalTd);
+
+          const descTd = document.createElement('td');
+          descTd.textContent = r.descricao || '';
+          tr.appendChild(descTd);
+
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Detalhe da Receita</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="login-header">
+    <div class="container">
+      <nav>
+        <a class="brand" href="dashboard_paciente.html">
+          <img src="images/logo.png" alt="Logo NutriMatch">
+          <strong>NutriMatch</strong>
+        </a>
+        <div class="nav-links">
+          <a href="dashboard_paciente.html">Plano</a>
+          <a href="listagem_sugestoes.html">Sugestões</a>
+          <a href="detalhe_receita.html">Receita</a>
+          <!-- Sair via rota de logout -->
+          <a href="/logout">Sair</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+  <div class="container">
+
+    <div class="top-actions">
+      <button
+        type="button"
+        class="btn outline btn-back"
+        onclick="window.history.back()"
+      >
+        ← Voltar
+      </button>
+    </div>
+
+      <section class="card">
+        <!-- Cabeçalho genérico da receita -->
+        <!-- Cabeçalho genérico da receita -->
+        <header style="margin-bottom:1rem;">
+
+          <h2>Nome da receita (ex.: Panqueca de banana)</h2>
+
+          <!-- BOX DE INFORMAÇÕES COM CLASSE -->
+          <div class="info-box">
+
+            <p class="small" style="margin-bottom:.5rem;">
+              <strong>Tipo de refeição:</strong> Café da manhã / Lanche / Almoço / Jantar / Ceia
+            </p>
+
+            <p class="small" style="margin-bottom:.5rem;">
+              <strong>Meta da refeição:</strong> X kcal • 
+              <strong>Calorias estimadas da receita:</strong> ~Y kcal (±10%)
+            </p>
+
+            <p class="small" style="margin-bottom:.5rem;">
+              <strong>Origem:</strong> Plano da nutricionista • Banco de receitas • Receita gerada por IA
+            </p>
+
+            <p class="small">
+              As informações abaixo representam a porção ajustada para se encaixar na meta calórica da refeição.
+              Em um sistema completo, esses dados viriam diretamente do banco de dados a partir da receita escolhida.
+            </p>
+
+          </div>
+        </header>
+
+
+
+        <div class="grid grid-2">
+
+          <!-- Coluna esquerda: porções e ingredientes -->
+          <div>
+            <h3>Porções e ingredientes</h3>
+            <p class="small">
+              <strong>Rendimento:</strong> 1 porção individual (ou X porções)
+            </p>
+
+            <!-- Lista genérica de ingredientes -->
+            <ul>
+              <li>Ingrediente 1: <strong>quantidade + unidade</strong></li>
+              <li>Ingrediente 2: <strong>quantidade + unidade</strong></li>
+              <li>Ingrediente 3: <strong>quantidade + unidade</strong></li>
+              <!-- outros ingredientes... -->
+            </ul>
+
+            <!-- Informações calóricas estimadas -->
+            <p class="small" style="margin-top:.6rem;">
+              <strong>Informação calórica estimada:</strong><br>
+              • Ingrediente 1 ≈ A kcal<br>
+              • Ingrediente 2 ≈ B kcal<br>
+              • Ingrediente 3 ≈ C kcal<br>
+              <strong>Total:</strong> ~Y kcal
+            </p>
+          </div>
+
+          <!-- Coluna direita: modo de preparo + ações -->
+          <div>
+            <h3>Modo de preparo</h3>
+            <ol>
+              <li>Passo 1 da receita (ex.: preparar o ingrediente principal).</li>
+              <li>Passo 2 da receita (ex.: misturar ingredientes líquidos e secos).</li>
+              <li>Passo 3 da receita (ex.: levar ao fogo/forno por X minutos).</li>
+              <li>Passo 4 da receita (opcional: finalização / montagem).</li>
+            </ol>
+
+            <p class="small" style="margin-top:.5rem;">
+              Dica: observações extras podem ser exibidas aqui, como recomendações da nutricionista,
+              orientações de substituição de ingredientes ou cuidados com restrições alimentares.
+            </p>
+
+            <div class="actions" style="margin-top:1rem;">
+              <!-- Confirmar que essa receita será usada como substituição -->
+              <a class="btn" href="confirmacao.html">Confirmar substituição</a>
+
+              <!-- Voltar para a lista de sugestões -->
+              <a class="btn outline" href="listagem_sugestoes.html">Voltar para sugestões</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+  </footer>
+</body>
+</html>

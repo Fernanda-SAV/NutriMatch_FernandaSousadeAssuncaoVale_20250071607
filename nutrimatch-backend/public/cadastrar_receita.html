@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Cadastrar Receita</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="login-header">
+  <div class="container">
+    <nav>
+      <a class="brand" href="index.html">
+        <img src="images/logo.png" alt="Logo NutriMatch">
+        <strong>NutriMatch</strong>
+      </a>
+      <div class="nav-links">
+        <a href="dashboard_nutri.html">Dashboard</a>
+        <a href="lista_receitas.html">Receitas</a>
+        <a href="cadastrar_receita.html">Nova receita</a>
+        <!-- Link de saída para destruir a sessão e voltar ao início -->
+        <a href="/logout">Sair</a>
+      </div>
+    </nav>
+  </div>
+</header>
+<main>
+  <div class="container">
+
+    <div class="top-actions">
+      <button
+        type="button"
+        class="btn outline btn-back"
+        onclick="window.history.back()"
+      >
+        ← Voltar
+      </button>
+    </div>
+    
+    <h2>Cadastrar nova receita</h2>
+    <p class="small">Use o formulário abaixo para cadastrar uma nova receita no sistema.</p>
+    <form class="form-vertical" action="/receitas" method="post" id="form-receita">
+      <div class="campo">
+        <label for="nome">Nome da receita</label>
+        <input type="text" name="nome" id="nome" required>
+      </div>
+      <div class="campo">
+        <label for="kcal_total">Calorias totais (kcal)</label>
+        <input type="number" name="kcal_total" id="kcal_total" min="0" step="0.1" required>
+      </div>
+      <div class="campo">
+        <label for="descricao">Descrição</label>
+        <textarea name="descricao" id="descricao" rows="3"></textarea>
+      </div>
+      <div class="campo">
+        <label for="modo_preparo">Modo de preparo</label>
+        <textarea name="modo_preparo" id="modo_preparo" rows="4"></textarea>
+      </div>
+      <button class="btn" type="submit">Cadastrar receita</button>
+    </form>
+  </div>
+</main>
+<footer class="footer">
+  <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+</footer>
+<script src="js/app.js"></script>
+<script>
+  // Opcional: interceptar o envio para exibir mensagem ou validar antes de enviar ao backend
+  document.getElementById('form-receita').addEventListener('submit', function (e) {
+    // Aqui você poderia fazer validações extras ou enviar via fetch
+    // Por padrão, o formulário já fará um POST para /receitas e o servidor redirecionará para lista_receitas.html
+  });
+</script>
+</body>
+</html>
