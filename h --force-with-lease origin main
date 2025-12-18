@@ -1,0 +1,6 @@
+[35mnode_modules/cacache/package.json[m[36m:[m[32m8[m[36m:[m  "description": "Fast, fault-tolerant, cross-platform, di[1;31msk-[mbased, data-agnostic, content-addressable cache.",
+[35mnode_modules/mime-db/HISTORY.md[m[36m:[m[32m372[m[36m:[m  * Add `application/vnd.fastcopy-di[1;31msk-[mimage`
+[35mnode_modules/mime-db/HISTORY.md[m[36m:[m[32m380[m[36m:[m  * Add `application/vnd.msa-di[1;31msk-[mimage`
+[35mnode_modules/mime-db/db.json[m[36m:[m[32m1036[m[36m:[m  "application/mbms-m[1;31msk-[mresponse+xml": {
+[35mnode_modules/mime-db/db.json[m[36m:[m[32m3306[m[36m:[m  "application/vnd.fastcopy-di[1;31msk-[mimage": {
+[35mnode_modules/mime-db/db.json[m[36m:[m[32m4452[m[36m:[m  "application/vnd.msa-di[1;31msk-[mimage": {

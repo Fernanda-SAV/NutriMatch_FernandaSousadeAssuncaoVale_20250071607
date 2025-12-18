@@ -1,0 +1,8 @@
+# env
+.env
+*.env
+.env.*
+nutrimatch-backend/ia.env
+
+# deps
+node_modules/
