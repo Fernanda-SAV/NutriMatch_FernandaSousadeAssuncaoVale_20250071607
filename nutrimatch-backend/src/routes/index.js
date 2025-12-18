@@ -1,10 +1,16 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 
-router.use(require('./auth.routes'));
-router.use(require('./receitas.routes'));
-router.use(require('./pacientes.routes'));
-router.use(require('./plano.routes'));
-router.use(require('./diario.routes'));
-router.use(require('./ia.routes'));
+function safeUse(label, mod) {
+  console.log(label, '=>', typeof mod);
+  router.use(mod);
+}
+
+safeUse('auth', require('./auth.routes'));
+safeUse('receitas', require('./receitas.routes'));
+safeUse('pacientes', require('./pacientes.routes'));
+safeUse('plano', require('./plano.routes'));
+safeUse('diario', require('./diario.routes'));
+safeUse('ia', require('./ia.routes'));
 
 module.exports = router;
