@@ -1,45 +1,41 @@
 // src/controllers/pacientes.controller.js
 const pacientesModel = require('../models/pacientes.model');
 
-async function listar(req, res, next) {
+async function listar(req, res) {
   try {
-    const nutricionista_id = req.session.usuario_id;
-    const pacientes = await pacientesModel.listarPorNutricionista(nutricionista_id);
-    res.json(pacientes);
-  } catch (e) {
-    next(e);
+    const nutriId = req.session.usuario_id; // ✅ nutri logada
+    const pacientes = await pacientesModel.listarPorNutricionista(nutriId);
+    return res.json({ ok: true, pacientes });
+  } catch (err) {
+    console.error('Erro listar pacientes:', err.message);
+    return res.status(500).json({ ok: false, mensagem: 'Erro ao listar pacientes.' });
   }
 }
 
-async function vincular(req, res, next) {
+async function vincular(req, res) {
   try {
-    const nutricionista_id = req.session.usuario_id;
-    const { email_paciente } = req.body;
+    const nutriId = req.session.usuario_id;
+    const email = (req.body.email || '').trim().toLowerCase();
+    if (!email) return res.status(400).json({ ok: false, mensagem: 'Informe o e-mail do paciente.' });
 
-    if (!email_paciente) {
-      return res.status(400).json({ mensagem: 'Informe o e-mail do paciente.' });
-    }
-
-    await pacientesModel.vincularPorEmail(nutricionista_id, email_paciente);
-    res.json({ mensagem: 'Paciente vinculado com sucesso.' });
-  } catch (e) {
-    // caso o model jogue erro com status, respeita
-    const status = e.status || 500;
-    res.status(status).json({ mensagem: e.message || 'Erro ao vincular paciente.' });
+    const result = await pacientesModel.vincularPorEmail(nutriId, email);
+    return res.json({ ok: true, ...result });
+  } catch (err) {
+    console.error('Erro vincular paciente:', err.message);
+    return res.status(400).json({ ok: false, mensagem: err.message || 'Erro ao vincular paciente.' });
   }
 }
 
-async function desvincular(req, res, next) {
+async function desvincular(req, res) {
   try {
-    const nutricionista_id = req.session.usuario_id;
-    const paciente_id = req.params.id;
+    const nutriId = req.session.usuario_id;
+    const pacienteId = Number(req.params.id);
 
-    const ok = await pacientesModel.desvincular(nutricionista_id, paciente_id);
-    if (!ok) return res.status(404).json({ mensagem: 'Vínculo não encontrado.' });
-
-    res.json({ mensagem: 'Paciente desvinculado com sucesso.' });
-  } catch (e) {
-    next(e);
+    await pacientesModel.desvincular(nutriId, pacienteId);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('Erro desvincular:', err.message);
+    return res.status(400).json({ ok: false, mensagem: err.message || 'Erro ao desvincular.' });
   }
 }
 

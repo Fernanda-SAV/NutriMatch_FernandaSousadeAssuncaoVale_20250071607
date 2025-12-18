@@ -7,7 +7,6 @@
 </head>
 <body>
 
-<!-- Cabeçalho atualizado para a página de login do nutricionista -->
 <header class="login-header">
   <div class="container">
     <nav>
@@ -15,7 +14,6 @@
         <img src="images/logo.png" alt="Logo NutriMatch">
         <strong>NutriMatch</strong>
       </a>
-      <!-- Botão para voltar à página inicial -->
       <a class="btn outline" href="index.html">Voltar</a>
     </nav>
   </div>
@@ -27,8 +25,8 @@
 
       <h2>Entrar — Nutricionista</h2>
 
-      <!-- FORMULÁRIO DE LOGIN -->
-      <form class="form-vertical" method="POST" action="/login">
+      <form id="form-login-nutri" class="form-vertical" method="POST" action="/login">
+        <input type="hidden" name="tipo" value="nutricionista">
 
         <div class="campo">
           <label for="email">E-mail</label>
@@ -42,6 +40,7 @@
 
         <button class="btn btn-primary" type="submit" style="margin-top: 1rem;">Login</button>
 
+        <div class="erro-login" aria-live="polite"></div>
       </form>
 
       <div class="actions" style="margin-top:1rem; text-align:center;">
@@ -50,6 +49,14 @@
         </a>
       </div>
 
+      <!-- MODAL POPUP DE ERRO -->
+      <div id="modal-erro" class="nm-modal nm-hidden" role="dialog" aria-modal="true" aria-labelledby="nm-modal-title">
+        <div class="nm-modal-box">
+          <h3 id="nm-modal-title">Ops!</h3>
+          <p id="modal-erro-msg">E-mail ou senha inválidos.</p>
+          <button type="button" class="btn btn-primary" id="btn-fechar-modal">OK</button>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -58,6 +65,90 @@
 <footer class="footer">
   <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
 </footer>
+
+<script>
+  (function () {
+    const form = document.getElementById('form-login-nutri');
+    const modal = document.getElementById('modal-erro');
+    const msgEl = document.getElementById('modal-erro-msg');
+    const btnFechar = document.getElementById('btn-fechar-modal');
+    const erroInline = document.querySelector('.erro-login');
+
+    function abrirModal(msg) {
+      msgEl.textContent = msg || 'E-mail ou senha inválidos.';
+      modal.classList.remove('nm-hidden');
+      btnFechar.focus();
+    }
+
+    function fecharModal() {
+      modal.classList.add('nm-hidden');
+    }
+
+    btnFechar.addEventListener('click', fecharModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) fecharModal();
+    });
+
+    // fecha com ESC
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('nm-hidden')) fecharModal();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (erroInline) erroInline.textContent = '';
+
+      const formData = new FormData(form);
+
+      try {
+        const resp = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData).toString()
+        });
+
+        const data = await resp.json().catch(() => null);
+
+        if (!resp.ok || !data || data.ok === false) {
+          const msg = (data && data.mensagem) ? data.mensagem : 'E-mail ou senha inválidos.';
+          abrirModal(msg);
+          return;
+        }
+
+        window.location.href = data.redirect || '/dashboard_nutri.html';
+      } catch (err) {
+        abrirModal('Erro ao conectar com o servidor. Tente novamente.');
+      }
+    });
+  })();
+</script>
+
+<style>
+  /* Modal (isolado para não depender do style.css) */
+  .nm-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 9999;
+  }
+
+  /* quando estiver escondido */
+  .nm-modal.nm-hidden { display: none; }
+
+  .nm-modal-box {
+    width: min(420px, 95vw);
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.2rem 1.2rem 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .nm-modal-box h3 { margin: 0 0 0.5rem; }
+  .nm-modal-box p { margin: 0 0 1rem; }
+</style>
 
 </body>
 </html>

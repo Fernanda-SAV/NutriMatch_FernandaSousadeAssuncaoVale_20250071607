@@ -1,41 +1,63 @@
 // src/models/pacientes.model.js
 const { db } = require('../database/connection');
 
-function listarPorNutricionista(nutricionista_id) {
+function listarPorNutricionista(nutriId) {
   return new Promise((resolve, reject) => {
     const sql = `
-      SELECT p.id as paciente_id, u.nome, u.email, p.meta_kcal_diaria, p.peso, p.altura
+      SELECT
+        p.id AS paciente_id,
+        u.id AS usuario_id,
+        u.nome,
+        u.email,
+        u.telefone,
+        u.sexo,
+        u.nascimento,
+        u.peso,
+        u.altura
       FROM pacientes p
       JOIN usuarios u ON u.id = p.usuario_id
       WHERE p.nutricionista_id = ?
       ORDER BY u.nome ASC
     `;
-    db.all(sql, [nutricionista_id], (err, rows) => {
+    db.all(sql, [nutriId], (err, rows) => {
       if (err) return reject(err);
-      resolve(rows);
+      resolve(rows || []);
     });
   });
 }
 
-function vincularPorEmail(nutricionista_id, email_paciente) {
+function vincularPorEmail(nutriId, email) {
   return new Promise((resolve, reject) => {
+    // acha usuario paciente pelo email
     db.get(
-      `SELECT id FROM usuarios WHERE email = ? AND tipo = 'paciente'`,
-      [email_paciente],
+      `SELECT id, tipo FROM usuarios WHERE email = ?`,
+      [email],
       (err, user) => {
         if (err) return reject(err);
-        if (!user) {
-          const e = new Error('Paciente não encontrado (confira o e-mail e o tipo).');
-          e.status = 404;
-          return reject(e);
-        }
+        if (!user) return reject(new Error('Paciente não encontrado.'));
+        if (user.tipo !== 'paciente') return reject(new Error('Este e-mail não é de um paciente.'));
 
-        db.run(
-          `UPDATE pacientes SET nutricionista_id = ? WHERE usuario_id = ?`,
-          [nutricionista_id, user.id],
-          function (err2) {
+        // acha registro na tabela pacientes
+        db.get(
+          `SELECT id, nutricionista_id FROM pacientes WHERE usuario_id = ?`,
+          [user.id],
+          (err2, pac) => {
             if (err2) return reject(err2);
-            resolve(true);
+            if (!pac) return reject(new Error('Registro de paciente não encontrado (tabela pacientes).'));
+
+            // se já vinculado a outro nutri, você decide a regra:
+            if (pac.nutricionista_id && pac.nutricionista_id !== nutriId) {
+              return reject(new Error('Paciente já está vinculado a outro nutricionista.'));
+            }
+
+            db.run(
+              `UPDATE pacientes SET nutricionista_id = ? WHERE id = ?`,
+              [nutriId, pac.id],
+              function (err3) {
+                if (err3) return reject(err3);
+                resolve({ paciente_id: pac.id, usuario_id: user.id });
+              }
+            );
           }
         );
       }
@@ -43,14 +65,15 @@ function vincularPorEmail(nutricionista_id, email_paciente) {
   });
 }
 
-function desvincular(nutricionista_id, paciente_id) {
+function desvincular(nutriId, pacienteId) {
   return new Promise((resolve, reject) => {
     db.run(
       `UPDATE pacientes SET nutricionista_id = NULL WHERE id = ? AND nutricionista_id = ?`,
-      [paciente_id, nutricionista_id],
+      [pacienteId, nutriId],
       function (err) {
         if (err) return reject(err);
-        resolve(this.changes > 0);
+        if (this.changes === 0) return reject(new Error('Paciente não encontrado ou não vinculado a você.'));
+        resolve();
       }
     );
   });

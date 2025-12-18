@@ -17,7 +17,7 @@
           <a href="dashboard_nutri.html">Meus pacientes</a>
           <a href="paciente.html">Paciente</a>
           <a href="editar_pacientes.html">Editar pacientes</a>
-          <a href="index.html">Sair</a>
+          <a href="/logout">Sair</a>
         </div>
       </nav>
     </div>
@@ -46,7 +46,7 @@
           medidas corporais a cada consulta.
         </p>
 
-        <form class="form-vertical" method="POST" action="/vincular-paciente">
+        <form id="form-vincular" class="form-vertical">
           <div class="campo">
             <label for="email_paciente">E-mail do paciente cadastrado no NutriMatch</label>
             <input
@@ -57,15 +57,14 @@
               required>
           </div>
 
-          <!-- No sistema real, esse botão acionaria a rota /vincular-paciente no backend -->
           <button class="btn" type="submit">Vincular paciente</button>
         </form>
 
         <p class="small" style="margin-top:.6rem;">
-          Em uma versão completa, o sistema verificaria se o e-mail existe, se pertence a um usuário do tipo
-          paciente e, se estiver tudo certo, criaria/atualizaria o vínculo entre você e o paciente na base
-          de dados.
+          O sistema verifica se o e-mail existe, se pertence a um usuário do tipo paciente e,
+          se estiver tudo certo, cria o vínculo entre você e o paciente na base de dados.
         </p>
+
       </section>
 
       <!-- LISTA DE PACIENTES JÁ VINCULADOS -->
@@ -76,30 +75,11 @@
           <a class="btn outline" href="editar_pacientes.html">Editar pacientes</a>
         </div>
 
-        <div class="grid grid-2">
-          <div class="card">
-            <h3>João Silva</h3>
-            <p class="small">
-              Meta diária: 1.800 kcal • Plano ativo: Semanal A<br>
-              Última consulta: 05/12/2025 • Próximo retorno: 20/12/2025
-            </p>
-            <div class="actions">
-              <a class="btn" href="paciente.html">Ver plano, medidas e substituições</a>
-            </div>
-          </div>
+        <div id="meus-pacientes-msg" class="small"></div>
+        <div id="meus-pacientes-grid" class="grid grid-2"></div>
 
-          <div class="card">
-            <h3>Maria Santos</h3>
-            <p class="small">
-              Meta diária: 1.600 kcal • Plano ativo: Cutting<br>
-              Última consulta: 02/12/2025 • Próximo retorno: 17/12/2025
-            </p>
-            <div class="actions">
-              <a class="btn" href="paciente.html">Ver plano, medidas e substituições</a>
-            </div>
-          </div>
-        </div>
       </section>
+
 
     </div>
   </main>
@@ -109,6 +89,55 @@
   </footer>
 
 <script src="js/app.js"></script>
+<script>
+  async function carregarPacientes() {
+    const grid = document.getElementById('meus-pacientes-grid');
+    const msg = document.getElementById('meus-pacientes-msg');
+
+    msg.textContent = 'Carregando pacientes...';
+    grid.innerHTML = '';
+
+    try {
+      const response = await fetch('/api/pacientes');
+      const data = await response.json();
+
+      if (!response.ok) {
+        msg.textContent = data.mensagem || 'Erro ao carregar pacientes.';
+        return;
+      }
+
+      const pacientes = data.pacientes || [];
+
+      if (!pacientes.length) {
+        msg.textContent = 'Nenhum paciente vinculado ainda.';
+        return;
+      }
+
+      msg.textContent = '';
+
+      grid.innerHTML = pacientes.map(p => `
+        <div class="card">
+          <h3>${p.nome}</h3>
+          <p class="small">
+            ${p.email ? `E-mail: ${p.email}<br>` : ''}
+            ${p.meta_kcal_diaria ? `Meta diária: ${p.meta_kcal_diaria} kcal<br>` : ''}
+            ${p.peso ? `Peso: ${p.peso} kg • ` : ''}${p.altura ? `Altura: ${p.altura} cm` : ''}
+          </p>
+          <div class="actions">
+            <a class="btn" href="paciente.html">Ver plano</a>
+          </div>
+        </div>
+      `).join('');
+
+    } catch (err) {
+      msg.textContent = 'Erro de conexão com o servidor.';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', carregarPacientes);
+</script>
+
+
 
 
 </body>

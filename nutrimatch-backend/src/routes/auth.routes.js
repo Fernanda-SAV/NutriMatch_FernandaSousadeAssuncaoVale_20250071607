@@ -1,12 +1,13 @@
+// src/routes/auth.routes.js
 const express = require('express');
 const router = express.Router();
 
-router.post('/login', (req, res) => {
-  res.json({ ok: true });
-});
+const authController = require('../controllers/auth.controller');
 
-router.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
-});
+router.post('/login', authController.login);
+router.get('/logout', authController.logout);
+
+// ✅ NOVO: cadastro
+router.post('/cadastro', authController.cadastro);
 
 module.exports = router;
