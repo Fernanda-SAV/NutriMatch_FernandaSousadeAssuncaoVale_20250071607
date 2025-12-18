@@ -36,15 +36,25 @@ db.serialize(() => {
     );
   `);
 
-  db.run(`
+    db.run(`
     CREATE TABLE IF NOT EXISTS pacientes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      usuario_id INTEGER NOT NULL,
-      nutricionista_id INTEGER,
-      FOREIGN KEY(usuario_id) REFERENCES usuarios(id),
-      FOREIGN KEY(nutricionista_id) REFERENCES usuarios(id)
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL,
+        nutricionista_id INTEGER,
+        peso REAL,
+        altura REAL,
+        meta_kcal_diaria INTEGER,
+        FOREIGN KEY(usuario_id) REFERENCES usuarios(id),
+        FOREIGN KEY(nutricionista_id) REFERENCES usuarios(id)
     );
-  `);
+    `);
+
+    db.run(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_pacientes_usuario_id
+    ON pacientes(usuario_id);
+    `);
+
+
 
   db.run(`
     CREATE TABLE IF NOT EXISTS planos_refeicoes (

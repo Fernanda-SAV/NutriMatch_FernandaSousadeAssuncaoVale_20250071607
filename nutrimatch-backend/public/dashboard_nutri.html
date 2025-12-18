@@ -99,14 +99,15 @@
 
     try {
       const response = await fetch('/api/pacientes');
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        msg.textContent = data.mensagem || 'Erro ao carregar pacientes.';
+        msg.textContent = (data && data.mensagem) ? data.mensagem : 'Erro ao carregar pacientes.';
         return;
       }
 
-      const pacientes = data.pacientes || [];
+      // ✅ funciona se a API retornar array direto ou { ok, pacientes }
+      const pacientes = Array.isArray(data) ? data : (data && data.pacientes) ? data.pacientes : [];
 
       if (!pacientes.length) {
         msg.textContent = 'Nenhum paciente vinculado ainda.';
@@ -117,11 +118,11 @@
 
       grid.innerHTML = pacientes.map(p => `
         <div class="card">
-          <h3>${p.nome}</h3>
+          <h3>${p.nome || 'Paciente'}</h3>
           <p class="small">
             ${p.email ? `E-mail: ${p.email}<br>` : ''}
-            ${p.meta_kcal_diaria ? `Meta diária: ${p.meta_kcal_diaria} kcal<br>` : ''}
-            ${p.peso ? `Peso: ${p.peso} kg • ` : ''}${p.altura ? `Altura: ${p.altura} cm` : ''}
+            ${p.meta_kcal_diaria != null ? `Meta diária: ${p.meta_kcal_diaria} kcal<br>` : ''}
+            ${p.peso != null ? `Peso: ${p.peso} kg • ` : ''}${p.altura != null ? `Altura: ${p.altura} cm` : ''}
           </p>
           <div class="actions">
             <a class="btn" href="paciente.html">Ver plano</a>
@@ -134,8 +135,44 @@
     }
   }
 
-  window.addEventListener('DOMContentLoaded', carregarPacientes);
+  async function vincularPaciente(event) {
+    event.preventDefault();
+
+    const input = document.getElementById('email_paciente');
+    const email_paciente = (input.value || '').trim().toLowerCase();
+
+    if (!email_paciente) return;
+
+    try {
+      const resp = await fetch('/vincular-paciente', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email_paciente })
+      });
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        alert(data.mensagem || 'Erro ao vincular paciente.');
+        return;
+      }
+
+      alert(data.mensagem || 'Paciente vinculado com sucesso!');
+      input.value = '';
+      await carregarPacientes();
+
+    } catch (e) {
+      alert('Erro de comunicação com o servidor.');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form-vincular');
+    if (form) form.addEventListener('submit', vincularPaciente);
+    carregarPacientes();
+  });
 </script>
+
 
 
 

@@ -26,36 +26,39 @@ function listarPorNutricionista(nutriId) {
   });
 }
 
-function vincularPorEmail(nutriId, email) {
+function vincularPorEmail(nutricionista_id, email_paciente) {
   return new Promise((resolve, reject) => {
-    // acha usuario paciente pelo email
     db.get(
-      `SELECT id, tipo FROM usuarios WHERE email = ?`,
-      [email],
+      `SELECT id FROM usuarios WHERE email = ? AND tipo = 'paciente'`,
+      [email_paciente],
       (err, user) => {
         if (err) return reject(err);
-        if (!user) return reject(new Error('Paciente não encontrado.'));
-        if (user.tipo !== 'paciente') return reject(new Error('Este e-mail não é de um paciente.'));
 
-        // acha registro na tabela pacientes
-        db.get(
-          `SELECT id, nutricionista_id FROM pacientes WHERE usuario_id = ?`,
-          [user.id],
-          (err2, pac) => {
+        if (!user) {
+          const e = new Error('Paciente não encontrado (confira o e-mail e o tipo).');
+          e.status = 404;
+          return reject(e);
+        }
+
+        // 1) tenta atualizar vínculo (caso já exista registro em pacientes)
+        db.run(
+          `UPDATE pacientes SET nutricionista_id = ? WHERE usuario_id = ?`,
+          [nutricionista_id, user.id],
+          function (err2) {
             if (err2) return reject(err2);
-            if (!pac) return reject(new Error('Registro de paciente não encontrado (tabela pacientes).'));
 
-            // se já vinculado a outro nutri, você decide a regra:
-            if (pac.nutricionista_id && pac.nutricionista_id !== nutriId) {
-              return reject(new Error('Paciente já está vinculado a outro nutricionista.'));
+            // ✅ se atualizou, ok
+            if (this.changes > 0) {
+              return resolve(true);
             }
 
+            // 2) se não existia registro em pacientes, cria agora (UPSERT manual)
             db.run(
-              `UPDATE pacientes SET nutricionista_id = ? WHERE id = ?`,
-              [nutriId, pac.id],
+              `INSERT INTO pacientes (usuario_id, nutricionista_id) VALUES (?, ?)`,
+              [user.id, nutricionista_id],
               function (err3) {
                 if (err3) return reject(err3);
-                resolve({ paciente_id: pac.id, usuario_id: user.id });
+                resolve(true);
               }
             );
           }
@@ -64,6 +67,8 @@ function vincularPorEmail(nutriId, email) {
     );
   });
 }
+
+
 
 function desvincular(nutriId, pacienteId) {
   return new Promise((resolve, reject) => {
