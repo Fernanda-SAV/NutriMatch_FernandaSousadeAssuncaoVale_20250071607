@@ -88,7 +88,7 @@
     <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
   </footer>
 
-<script src="js/app.js"></script>
+<!--script src="js/app.js"></script>-->
 <script>
   async function carregarPacientes() {
     const grid = document.getElementById('meus-pacientes-grid');
@@ -138,16 +138,19 @@
   async function vincularPaciente(event) {
     event.preventDefault();
 
-    const input = document.getElementById('email_paciente');
-    const email_paciente = (input.value || '').trim().toLowerCase();
+    const form = event.currentTarget;
+    const email_paciente = (form.email_paciente.value || '').trim().toLowerCase();
 
-    if (!email_paciente) return;
+    if (!email_paciente) {
+      alert('Informe o e-mail do paciente.');
+      return;
+    }
 
     try {
       const resp = await fetch('/vincular-paciente', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email_paciente })
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: new URLSearchParams({ email_paciente }).toString()
       });
 
       const data = await resp.json().catch(() => ({}));
@@ -158,7 +161,7 @@
       }
 
       alert(data.mensagem || 'Paciente vinculado com sucesso!');
-      input.value = '';
+      form.reset();
       await carregarPacientes();
 
     } catch (e) {
@@ -169,8 +172,8 @@
   window.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form-vincular');
     if (form) form.addEventListener('submit', vincularPaciente);
-    carregarPacientes();
   });
+
 </script>
 
 

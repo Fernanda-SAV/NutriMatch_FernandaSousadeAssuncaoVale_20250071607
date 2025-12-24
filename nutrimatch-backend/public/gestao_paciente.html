@@ -69,7 +69,7 @@
 
     <!-- CABEÇALHO -->
     <section class="card">
-      <h2>Gestão do paciente — João Silva</h2>
+      <h2 id="titulo-paciente">Gestão do paciente</h2>
       <p class="small">
         Use as abas abaixo para alternar entre dados do paciente, plano alimentar e diário alimentar.
         Apenas uma seção fica visível por vez.
@@ -88,35 +88,55 @@
       <h3>Dados do paciente</h3>
       <p class="small">Informações básicas e medidas corporais.</p>
 
-      <form class="form-vertical" onsubmit="return false">
+      <form class="form-vertical" id="form-dados" onsubmit="return false">
         <div class="campo">
           <label>Nome completo</label>
-          <input value="João Silva">
+          <input id="nome" value="">
         </div>
 
         <div class="campo">
           <label>E-mail</label>
-          <input type="email" value="joao.silva@exemplo.com">
+          <input id="email" type="email" value="">
+        </div>
+
+        <div class="campo">
+          <label>Telefone</label>
+          <input id="telefone" type="tel" value="">
+        </div>
+
+        <div class="campo">
+          <label>Data de nascimento</label>
+          <input id="nascimento" type="date" value="">
+        </div>
+
+        <div class="campo">
+          <label>Sexo</label>
+          <select id="sexo">
+            <option value="">Selecione</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+            <option value="O">Outro</option>
+          </select>
         </div>
 
         <div class="campo">
           <label>Peso (kg)</label>
-          <input type="number" step="0.1" value="78.5">
+          <input id="peso" type="number" step="0.1" value="">
         </div>
 
         <div class="campo">
           <label>Altura (cm)</label>
-          <input type="number" value="175">
+          <input id="altura" type="number" value="">
         </div>
 
         <div class="campo">
           <label>Meta calórica diária (kcal)</label>
-          <input type="number" min="800" max="6000" value="1800">
+          <input id="meta_kcal" type="number" min="800" max="6000" value="">
         </div>
 
         <div class="campo">
           <label>Observações clínicas</label>
-          <textarea rows="3">Foco em redução de gordura corporal.</textarea>
+          <textarea id="observacoes" rows="3"></textarea>
         </div>
 
         <button class="btn" type="submit">Salvar alterações</button>
@@ -230,6 +250,95 @@
 <!-- SCRIPT: ABAS EXCLUSIVAS COM COR DINÂMICA -->
   <!-- Carrega funcionalidades dinâmicas (abas e outras ações) -->
   <script src="js/app.js"></script>
+
+  <script>
+    async function carregarPaciente() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pacienteId = urlParams.get('paciente_id');
+
+      if (!pacienteId) {
+        alert('Paciente não especificado.');
+        window.history.back();
+        return;
+      }
+
+      try {
+        const resp = await fetch(`/api/pacientes/${pacienteId}`);
+        if (!resp.ok) {
+          const erro = await resp.json().catch(() => ({}));
+          alert(erro.mensagem || 'Erro ao carregar paciente.');
+          window.history.back();
+          return;
+        }
+
+        const data = await resp.json();
+        const paciente = data.paciente;
+
+        // Preencher título
+        document.getElementById('titulo-paciente').textContent = `Gestão do paciente — ${paciente.nome}`;
+
+        // Preencher campos
+        document.getElementById('nome').value = paciente.nome || '';
+        document.getElementById('email').value = paciente.email || '';
+        document.getElementById('telefone').value = paciente.telefone || '';
+        document.getElementById('nascimento').value = paciente.nascimento || '';
+        document.getElementById('sexo').value = paciente.sexo || '';
+        document.getElementById('peso').value = paciente.peso || '';
+        document.getElementById('altura').value = paciente.altura || '';
+        document.getElementById('meta_kcal').value = paciente.meta_kcal_diaria || '';
+        document.getElementById('observacoes').value = ''; // Não temos no banco ainda
+
+      } catch (err) {
+        console.error(err);
+        alert('Erro de comunicação com o servidor.');
+        window.history.back();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarPaciente();
+
+      // Form submit
+      document.getElementById('form-dados').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const pacienteId = urlParams.get('paciente_id');
+
+        const dados = {
+          nome: document.getElementById('nome').value,
+          email: document.getElementById('email').value,
+          telefone: document.getElementById('telefone').value,
+          nascimento: document.getElementById('nascimento').value,
+          sexo: document.getElementById('sexo').value,
+          peso: document.getElementById('peso').value,
+          altura: document.getElementById('altura').value,
+          meta_kcal: document.getElementById('meta_kcal').value
+        };
+
+        try {
+          const resp = await fetch(`/api/pacientes/${pacienteId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+          });
+
+          if (!resp.ok) {
+            const erro = await resp.json().catch(() => ({}));
+            alert(erro.mensagem || 'Erro ao salvar.');
+            return;
+          }
+
+          const data = await resp.json();
+          alert(data.mensagem || 'Dados salvos com sucesso!');
+
+        } catch (err) {
+          console.error(err);
+          alert('Erro de comunicação com o servidor.');
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>

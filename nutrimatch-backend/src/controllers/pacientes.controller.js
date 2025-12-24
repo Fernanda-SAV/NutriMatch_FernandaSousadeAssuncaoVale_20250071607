@@ -15,7 +15,7 @@ async function listar(req, res) {
 async function vincular(req, res) {
   try {
     const nutriId = req.session.usuario_id;
-    const email = (req.body.email || '').trim().toLowerCase();
+    const email = (req.body.email_paciente || '').trim().toLowerCase();
     if (!email) return res.status(400).json({ ok: false, mensagem: 'Informe o e-mail do paciente.' });
 
     const result = await pacientesModel.vincularPorEmail(nutriId, email);
@@ -23,6 +23,47 @@ async function vincular(req, res) {
   } catch (err) {
     console.error('Erro vincular paciente:', err.message);
     return res.status(400).json({ ok: false, mensagem: err.message || 'Erro ao vincular paciente.' });
+  }
+}
+
+async function atualizar(req, res) {
+  try {
+    const nutriId = req.session.usuario_id;
+    const pacienteId = Number(req.params.id);
+
+    const dados = {
+      nome: req.body.nome,
+      email: req.body.email,
+      telefone: req.body.telefone,
+      nascimento: req.body.nascimento,
+      sexo: req.body.sexo,
+      peso: req.body.peso ? Number(req.body.peso) : null,
+      altura: req.body.altura ? Number(req.body.altura) : null,
+      meta_kcal_diaria: req.body.meta_kcal ? Number(req.body.meta_kcal) : null
+    };
+
+    await pacientesModel.atualizarPaciente(nutriId, pacienteId, dados);
+    return res.json({ ok: true, mensagem: 'Dados atualizados com sucesso!' });
+  } catch (err) {
+    console.error('Erro atualizar paciente:', err.message);
+    return res.status(400).json({ ok: false, mensagem: err.message || 'Erro ao atualizar paciente.' });
+  }
+}
+
+async function obter(req, res) {
+  try {
+    const nutriId = req.session.usuario_id;
+    const pacienteId = Number(req.params.id);
+
+    const paciente = await pacientesModel.obterPorId(nutriId, pacienteId);
+    if (!paciente) {
+      return res.status(404).json({ ok: false, mensagem: 'Paciente não encontrado.' });
+    }
+
+    return res.json({ ok: true, paciente });
+  } catch (err) {
+    console.error('Erro obter paciente:', err.message);
+    return res.status(500).json({ ok: false, mensagem: 'Erro ao obter paciente.' });
   }
 }
 
@@ -39,4 +80,4 @@ async function desvincular(req, res) {
   }
 }
 
-module.exports = { listar, vincular, desvincular };
+module.exports = { listar, obter, atualizar, vincular, desvincular };
