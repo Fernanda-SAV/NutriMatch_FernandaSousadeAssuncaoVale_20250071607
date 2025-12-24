@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriMatch — Meu Perfil</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="login-header">
+    <div class="container">
+      <nav>
+        <a class="brand" href="#" id="brand-link">
+          <img src="images/logo.png" alt="Logo NutriMatch">
+        </a>
+        <div class="nav-links" id="nav-links">
+          <!-- Links will be set by JS -->
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="top-actions">
+        <button
+          type="button"
+          class="btn outline btn-back"
+          onclick="window.history.back()"
+        >
+          ← Voltar
+        </button>
+      </div>
+
+      <section class="card">
+        <h2>Meu Perfil</h2>
+        <form id="form-perfil" class="form-vertical">
+          <div class="campo">
+            <label for="nome">Nome completo</label>
+            <input id="nome" name="nome" type="text" required>
+          </div>
+
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" required>
+          </div>
+
+          <div class="campo">
+            <label for="telefone">Telefone</label>
+            <input id="telefone" name="telefone" type="tel">
+          </div>
+
+          <div class="campo">
+            <label for="nascimento">Data de nascimento</label>
+            <input id="nascimento" name="nascimento" type="date">
+          </div>
+
+          <div class="campo">
+            <label for="sexo">Sexo</label>
+            <select id="sexo" name="sexo">
+              <option value="">Selecione</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+              <option value="O">Outro</option>
+            </select>
+          </div>
+
+          <div class="campo paciente-only">
+            <label for="peso">Peso (kg)</label>
+            <input id="peso" name="peso" type="number" step="0.1">
+          </div>
+
+          <div class="campo paciente-only">
+            <label for="altura">Altura (cm)</label>
+            <input id="altura" name="altura" type="number">
+          </div>
+
+          <div class="campo nutri-only">
+            <label for="crn">CRN</label>
+            <input id="crn" name="crn" type="text">
+          </div>
+
+          <button class="btn" type="submit">Salvar alterações</button>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+  </footer>
+
+  <script>
+    async function carregarPerfil() {
+      try {
+        const resp = await fetch('/api/user');
+        if (!resp.ok) {
+          const errorData = await resp.json().catch(() => ({}));
+          alert(`Erro ao carregar perfil: ${resp.status} - ${errorData.mensagem || 'Erro desconhecido'}`);
+          return;
+        }
+        const user = await resp.json();
+
+        document.getElementById('nome').value = user.nome || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('telefone').value = user.telefone || '';
+        document.getElementById('nascimento').value = user.nascimento || '';
+        document.getElementById('sexo').value = user.sexo || '';
+        document.getElementById('peso').value = user.peso || '';
+        document.getElementById('altura').value = user.altura || '';
+        document.getElementById('crn').value = user.crn || '';
+
+        // Show/hide fields based on type
+        const pacienteOnly = document.querySelectorAll('.paciente-only');
+        const nutriOnly = document.querySelectorAll('.nutri-only');
+        const brandLink = document.getElementById('brand-link');
+        if (user.tipo === 'paciente') {
+          pacienteOnly.forEach(el => el.style.display = 'block');
+          nutriOnly.forEach(el => el.style.display = 'none');
+          brandLink.href = 'dashboard_paciente.html';
+          // Set nav for patient
+          document.getElementById('nav-links').innerHTML = `
+            <a href="dashboard_paciente.html">Plano</a>
+            <a href="detalhe_receita.html">Receitas</a>
+            <a href="perfil.html">👤</a>
+            <a href="/logout">Sair</a>
+          `;
+        } else {
+          pacienteOnly.forEach(el => el.style.display = 'none');
+          nutriOnly.forEach(el => el.style.display = 'block');
+          brandLink.href = 'dashboard_nutri.html';
+          // Set nav for nutri
+          document.getElementById('nav-links').innerHTML = `
+            <a href="dashboard_nutri.html">Meus pacientes</a>
+            <a href="perfil.html">👤</a>
+            <a href="/logout">Sair</a>
+          `;
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erro de comunicação.');
+      }
+    }
+
+    document.getElementById('form-perfil').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const updates = {};
+      for (let [key, value] of formData.entries()) {
+        if (value.trim()) updates[key] = value.trim();
+      }
+
+      try {
+        const resp = await fetch('/api/user', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates)
+        });
+        if (resp.ok) {
+          alert('Perfil atualizado com sucesso!');
+        } else {
+          alert('Erro ao atualizar perfil.');
+        }
+      } catch (err) {
+        alert('Erro de comunicação.');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', carregarPerfil);
+  </script>
+
+</body>
+</html>

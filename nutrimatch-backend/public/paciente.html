@@ -4,6 +4,14 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NutriMatch — Paciente (Nutri)</title>
   <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .edit-mode .editable { display: none; }
+    .edit-mode .edit-input { display: inline-block; }
+    .meal-edit { margin-top: 1rem; }
+    .meal-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border: 1px solid #ddd; margin-bottom: 0.5rem; }
+    .meal-item button { background: #f44336; color: white; border: none; padding: 0.2rem 0.5rem; cursor: pointer; }
+  </style>
 </head>
 <body>
   <header class="login-header">
@@ -11,11 +19,10 @@
     <nav>
       <a class="brand" href="dashboard_nutri.html">
         <img src="images/logo.png" alt="Logo NutriMatch">
-        <strong>NutriMatch</strong>
       </a>
       <div class="nav-links">
         <a href="dashboard_nutri.html">Meus pacientes</a>
-        <a href="editar_pacientes.html">Editar pacientes</a>
+        <a href="perfil.html">👤</a>
         <!-- Sair via rota de logout -->
         <a href="/logout">Sair</a>
       </div>
@@ -38,7 +45,12 @@
     <section class="card">
       <h2 id="titulo-plano">Plano alimentar</h2>
       <div class="kpis">
-        <div class="kpi"><div>Meta diária</div><strong id="meta-diaria">-</strong></div>
+        <div class="kpi">
+          <div>Meta diária</div>
+          <strong id="meta-diaria-display" class="editable">-</strong>
+          <input id="meta-diaria-input" class="edit-input" type="number" style="display:none;" placeholder="kcal">
+          <button id="salvar-meta" class="edit-input btn" style="display:none; margin-left:0.5rem;">Salvar</button>
+        </div>
         <div class="kpi"><div>Consumido hoje</div><strong id="consumido-hoje">-</strong></div>
         <div class="kpi"><div>Restante</div><strong id="restante">-</strong></div>
       </div>
@@ -66,12 +78,12 @@
       <a class="tab" href="#ceia">Ceia</a>
     </div>
     <div class="grid grid-3">
-      <div class="meal" id="cafe"><h3>Café da manhã (350 kcal)</h3><ul><li>Iogurte + granola</li><li>Omelete simples</li><li>Vitamina de banana</li></ul></div>
-      <div class="meal" id="lanche-manha"><h3>Lanche da manhã (150 kcal)</h3><ul><li>Banana</li><li>Mix de castanhas 20 g</li><li>Biscoito água (4 un)</li></ul></div>
-      <div class="meal" id="almoco"><h3>Almoço (600 kcal)</h3><ul><li>Frango + arroz + salada</li><li>Carne moída + purê</li><li>Peixe + batata</li></ul></div>
-      <div class="meal" id="lanche-tarde"><h3>Lanche da tarde (170 kcal)</h3><ul><li>Panqueca de banana</li><li>Mingau rápido</li><li>Maçã + amendoim</li></ul></div>
-      <div class="meal" id="jantar"><h3>Jantar (500 kcal)</h3><ul><li>Frango grelhado + legumes</li><li>Macarrão integral + molho</li><li>Omelete completa</li></ul></div>
-      <div class="meal" id="ceia"><h3>Ceia (opcional) (120 kcal)</h3><ul><li>Leite morno</li><li>Iogurte natural</li><li>Chá + torrada</li></ul></div>
+      <div class="meal" id="cafe"><h3>Café da manhã</h3><div class="meal-content"></div></div>
+      <div class="meal" id="lanche-manha"><h3>Lanche da manhã</h3><div class="meal-content"></div></div>
+      <div class="meal" id="almoco"><h3>Almoço</h3><div class="meal-content"></div></div>
+      <div class="meal" id="lanche-tarde"><h3>Lanche da tarde</h3><div class="meal-content"></div></div>
+      <div class="meal" id="jantar"><h3>Jantar</h3><div class="meal-content"></div></div>
+      <div class="meal" id="ceia"><h3>Ceia (opcional)</h3><div class="meal-content"></div></div>
     </div>
   </section>
 </div></main>
@@ -83,11 +95,16 @@
     async function carregarDados() {
       const urlParams = new URLSearchParams(window.location.search);
       const pacienteId = urlParams.get('paciente_id');
+      const isEdit = urlParams.get('edit') === 'true';
 
       if (!pacienteId) {
         alert('Paciente não especificado.');
         window.history.back();
         return;
+      }
+
+      if (isEdit) {
+        document.body.classList.add('edit-mode');
       }
 
       try {
@@ -106,7 +123,35 @@
         document.getElementById('titulo-plano').textContent = `Plano alimentar — ${paciente.nome}`;
 
         // Meta diária
-        document.getElementById('meta-diaria').textContent = paciente.meta_kcal_diaria ? `${paciente.meta_kcal_diaria} kcal` : '-';
+        const metaDisplay = document.getElementById('meta-diaria-display');
+        const metaInput = document.getElementById('meta-diaria-input');
+        const salvarMeta = document.getElementById('salvar-meta');
+        metaDisplay.textContent = paciente.meta_kcal_diaria ? `${paciente.meta_kcal_diaria} kcal` : '-';
+        if (isEdit) {
+          metaInput.value = paciente.meta_kcal_diaria || '';
+          salvarMeta.onclick = async () => {
+            const newMeta = Number(metaInput.value);
+            if (isNaN(newMeta) || newMeta <= 0) {
+              alert('Meta inválida.');
+              return;
+            }
+            try {
+              const resp = await fetch(`/api/pacientes/${pacienteId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ meta_kcal: newMeta })
+              });
+              if (resp.ok) {
+                metaDisplay.textContent = `${newMeta} kcal`;
+                alert('Meta atualizada!');
+              } else {
+                alert('Erro ao atualizar meta.');
+              }
+            } catch (e) {
+              alert('Erro de comunicação.');
+            }
+          };
+        }
 
         // Carregar plano do dia (hoje)
         const hoje = new Date().toISOString().slice(0, 10);
@@ -116,8 +161,8 @@
           plano = await respPlano.json();
         }
 
-        // Calcular consumido hoje (simulado, pois não temos diário real)
-        let consumido = 0; // Placeholder
+        // Calcular consumido hoje (simulado)
+        let consumido = 0;
         const restante = paciente.meta_kcal_diaria - consumido;
 
         document.getElementById('consumido-hoje').textContent = `${consumido} kcal`;
@@ -125,11 +170,81 @@
 
         document.getElementById('plano-info').textContent = `Plano: Diário • Refeições: ${plano.length} cadastradas`;
 
-        // Aqui podemos popular as refeições dinamicamente, mas por enquanto deixamos estático
+        // Popular refeições
+        const mealTypes = ['cafe', 'lanche-manha', 'almoco', 'lanche-tarde', 'jantar', 'ceia'];
+        mealTypes.forEach(type => {
+          const content = document.querySelector(`#${type} .meal-content`);
+          const mealsForType = plano.filter(m => m.refeicao === type);
+          if (isEdit) {
+            content.innerHTML = mealsForType.map(m => `
+              <div class="meal-item">
+                <span>${m.receita_recomendada} (${m.kcal_meta} kcal)</span>
+                <button onclick="removerRefeicao(${m.id})">Remover</button>
+              </div>
+            `).join('') + `
+              <div class="meal-edit">
+                <input type="text" placeholder="Receita" id="receita-${type}">
+                <input type="number" placeholder="kcal" id="kcal-${type}">
+                <button onclick="adicionarRefeicao('${type}')">Adicionar</button>
+              </div>
+            `;
+          } else {
+            content.innerHTML = `<ul>${mealsForType.map(m => `<li>${m.receita_recomendada} (${m.kcal_meta} kcal)</li>`).join('')}</ul>`;
+          }
+        });
 
       } catch (err) {
         console.error(err);
         alert('Erro de comunicação com o servidor.');
+      }
+    }
+
+    async function adicionarRefeicao(refeicao) {
+      const receita = document.getElementById(`receita-${refeicao}`).value.trim();
+      const kcal = Number(document.getElementById(`kcal-${refeicao}`).value);
+      if (!receita || isNaN(kcal) || kcal <= 0) {
+        alert('Preencha receita e kcal válidos.');
+        return;
+      }
+      const urlParams = new URLSearchParams(window.location.search);
+      const pacienteId = urlParams.get('paciente_id');
+      const hoje = new Date().toISOString().slice(0, 10);
+      try {
+        const resp = await fetch('/api/plano/refeicao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paciente_id: pacienteId,
+            data: hoje,
+            refeicao,
+            kcal_meta: kcal,
+            receita_recomendada: receita
+          })
+        });
+        if (resp.ok) {
+          document.getElementById(`receita-${refeicao}`).value = '';
+          document.getElementById(`kcal-${refeicao}`).value = '';
+          carregarDados(); // Recarregar
+        } else {
+          alert('Erro ao adicionar refeição.');
+        }
+      } catch (e) {
+        alert('Erro de comunicação.');
+      }
+    }
+
+    async function removerRefeicao(id) {
+      try {
+        const resp = await fetch(`/api/plano/refeicao/${id}`, {
+          method: 'DELETE'
+        });
+        if (resp.ok) {
+          carregarDados(); // Recarregar
+        } else {
+          alert('Erro ao remover refeição.');
+        }
+      } catch (e) {
+        alert('Erro de comunicação.');
       }
     }
 

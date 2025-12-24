@@ -69,4 +69,50 @@ async function buscarPlanoCompleto(req, res, next) {
   }
 }
 
-module.exports = { salvarPlano, buscarPlanoDoDia, buscarPlanoCompleto };
+/**
+ * Adiciona uma refeição ao plano
+ */
+async function adicionarRefeicao(req, res, next) {
+  try {
+    const nutricionista_id = req.session.usuario_id;
+    const { paciente_id, data, refeicao, kcal_meta, receita_recomendada } = req.body;
+
+    if (!paciente_id || !data || !refeicao || !kcal_meta || !receita_recomendada) {
+      return res.status(400).json({ mensagem: 'Campos obrigatórios: paciente_id, data, refeicao, kcal_meta, receita_recomendada.' });
+    }
+
+    const id = await planoModel.adicionarRefeicao({
+      nutricionista_id,
+      paciente_id,
+      data,
+      refeicao,
+      kcal_meta,
+      receita_recomendada,
+    });
+
+    res.json({ mensagem: 'Refeição adicionada com sucesso.', id });
+  } catch (e) {
+    next(e);
+  }
+}
+
+/**
+ * Remove uma refeição do plano
+ */
+async function removerRefeicao(req, res, next) {
+  try {
+    const nutricionista_id = req.session.usuario_id;
+    const id = req.params.id;
+
+    const changes = await planoModel.removerRefeicao(id, nutricionista_id);
+    if (changes === 0) {
+      return res.status(404).json({ mensagem: 'Refeição não encontrada ou não autorizada.' });
+    }
+
+    res.json({ mensagem: 'Refeição removida com sucesso.' });
+  } catch (e) {
+    next(e);
+  }
+}
+
+module.exports = { salvarPlano, buscarPlanoDoDia, buscarPlanoCompleto, adicionarRefeicao, removerRefeicao };

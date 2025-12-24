@@ -14,4 +14,10 @@ router.get('/api/plano', requireLogin, planoController.buscarPlanoDoDia);
 // Buscar plano completo do paciente (para nutricionista)
 router.get('/api/plano/:paciente_id', requireLogin, requireNutri, planoController.buscarPlanoCompleto);
 
+// Adicionar refeição ao plano
+router.post('/api/plano/refeicao', requireLogin, requireNutri, planoController.adicionarRefeicao);
+
+// Remover refeição do plano
+router.delete('/api/plano/refeicao/:id', requireLogin, requireNutri, planoController.removerRefeicao);
+
 module.exports = router;

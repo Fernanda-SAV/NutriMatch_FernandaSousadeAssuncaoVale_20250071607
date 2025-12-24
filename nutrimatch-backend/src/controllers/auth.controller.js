@@ -108,4 +108,71 @@ function logout(req, res) {
   req.session.destroy(() => res.redirect('/index.html'));
 }
 
-module.exports = { login, logout, cadastro };
+async function forgotPassword(req, res) {
+  try {
+    const email = (req.body.email || '').trim().toLowerCase();
+    const nova_senha = (req.body.nova_senha || '').trim();
+
+    if (!email || !nova_senha) {
+      return res.status(400).json({ mensagem: 'E-mail e nova senha são obrigatórios.' });
+    }
+
+    // Busca usuário
+    const user = await usuariosModel.buscarPorEmail(email);
+    if (!user) {
+      return res.status(404).json({ mensagem: 'E-mail não encontrado.' });
+    }
+
+    // Hash da nova senha
+    const senhaHash = await bcrypt.hash(nova_senha, 10);
+
+    // Atualiza senha
+    await usuariosModel.atualizarSenha(user.id, senhaHash);
+
+    return res.json({ mensagem: 'Senha alterada com sucesso.' });
+  } catch (err) {
+    console.error('Erro no forgot password:', err.message);
+    return res.status(500).json({ mensagem: 'Erro ao alterar senha.' });
+  }
+}
+
+async function getUser(req, res) {
+  try {
+    const userId = req.session.usuario_id;
+    const user = await usuariosModel.buscarPorId(userId);
+    if (!user) {
+      return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+    }
+    // Remove senha
+    delete user.senha;
+    res.json(user);
+  } catch (err) {
+    console.error('Erro get user:', err.message);
+    return res.status(500).json({ mensagem: 'Erro ao buscar usuário.' });
+  }
+}
+
+async function updateUser(req, res) {
+  try {
+    const userId = req.session.usuario_id;
+    const updates = req.body;
+
+    // Prevent updating sensitive fields
+    delete updates.id;
+    delete updates.senha;
+    delete updates.tipo;
+
+    const fields = Object.keys(updates);
+    if (!fields.length) {
+      return res.status(400).json({ mensagem: 'Nenhum campo para atualizar.' });
+    }
+
+    await usuariosModel.atualizarUsuario(userId, updates);
+    res.json({ mensagem: 'Dados atualizados com sucesso.' });
+  } catch (err) {
+    console.error('Erro update user:', err.message);
+    return res.status(500).json({ mensagem: 'Erro ao atualizar usuário.' });
+  }
+}
+
+module.exports = { login, logout, cadastro, forgotPassword, getUser, updateUser };

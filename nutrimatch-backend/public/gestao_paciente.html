@@ -41,12 +41,10 @@
     <nav>
       <a class="brand" href="dashboard_nutri.html">
         <img src="images/logo.png" alt="Logo NutriMatch">
-        <strong>NutriMatch</strong>
       </a>
       <div class="nav-links">
         <a href="dashboard_nutri.html">Meus pacientes</a>
-        <a href="gestao_paciente.html">Gestão do paciente</a>
-        <a href="editar_pacientes.html">Editar pacientes</a>
+        <a href="perfil.html">👤</a>
         <!-- Sair via rota de logout para terminar sessão -->
         <a href="/logout">Sair</a>
       </div>
@@ -155,7 +153,7 @@
       </div>
 
       <div class="actions" style="margin-top:.8rem;">
-        <a id="link-plano" class="btn" href="#">Editar plano alimentar</a>
+        <a id="link-plano" class="btn" href="paciente.html">Editar plano alimentar</a>
       </div>
     </section>
 
@@ -215,7 +213,7 @@
         // Definir link do plano
         const linkPlano = document.getElementById('link-plano');
         if (linkPlano) {
-          linkPlano.href = `paciente.html?paciente_id=${pacienteId}`;
+          linkPlano.href = `paciente.html?paciente_id=${pacienteId}&edit=true`;
         }
 
         // Preencher campos

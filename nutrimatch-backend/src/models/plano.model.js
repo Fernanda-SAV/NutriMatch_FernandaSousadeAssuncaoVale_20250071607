@@ -63,4 +63,31 @@ function buscarPlanoCompleto(paciente_id) {
   });
 }
 
-module.exports = { salvarPlano, buscarPlanoDoDia, getPacienteIdByUsuarioId, buscarPlanoCompleto };
+function adicionarRefeicao({ paciente_id, nutricionista_id, data, refeicao, kcal_meta, receita_recomendada }) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO planos_refeicoes (paciente_id, nutricionista_id, data, refeicao, kcal_meta, receita_recomendada)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [paciente_id, nutricionista_id, data, refeicao, kcal_meta, receita_recomendada],
+      function (err) {
+        if (err) return reject(err);
+        resolve(this.lastID);
+      }
+    );
+  });
+}
+
+function removerRefeicao(id, nutricionista_id) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `DELETE FROM planos_refeicoes WHERE id = ? AND nutricionista_id = ?`,
+      [id, nutricionista_id],
+      function (err) {
+        if (err) return reject(err);
+        resolve(this.changes);
+      }
+    );
+  });
+}
+
+module.exports = { salvarPlano, buscarPlanoDoDia, getPacienteIdByUsuarioId, buscarPlanoCompleto, adicionarRefeicao, removerRefeicao };

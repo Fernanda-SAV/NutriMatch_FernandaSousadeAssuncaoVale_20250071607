@@ -11,11 +11,10 @@
       <nav>
         <a class="brand" href="dashboard_nutri.html">
           <img src="images/logo.png" alt="Logo NutriMatch">
-          <strong>NutriMatch</strong>
         </a>
         <div class="nav-links">
           <a href="dashboard_nutri.html">Meus pacientes</a>
-          <a href="editar_pacientes.html">Editar pacientes</a>
+          <a href="perfil.html">👤</a>
           <a href="/logout">Sair</a>
         </div>
       </nav>
@@ -124,7 +123,7 @@
             ${p.peso != null ? `Peso: ${p.peso} kg • ` : ''}${p.altura != null ? `Altura: ${p.altura} cm` : ''}
           </p>
           <div class="actions">
-            <a class="btn" href="paciente.html">Ver plano</a>
+            <a class="btn" href="paciente.html?paciente_id=${p.paciente_id}">Ver plano</a>
           </div>
         </div>
       `).join('');
