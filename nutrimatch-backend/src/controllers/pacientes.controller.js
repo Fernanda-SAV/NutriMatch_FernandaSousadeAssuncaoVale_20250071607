@@ -32,11 +32,6 @@ async function atualizar(req, res) {
     const pacienteId = Number(req.params.id);
 
     const dados = {
-      nome: req.body.nome,
-      email: req.body.email,
-      telefone: req.body.telefone,
-      nascimento: req.body.nascimento,
-      sexo: req.body.sexo,
       peso: req.body.peso ? Number(req.body.peso) : null,
       altura: req.body.altura ? Number(req.body.altura) : null,
       meta_kcal_diaria: req.body.meta_kcal ? Number(req.body.meta_kcal) : null

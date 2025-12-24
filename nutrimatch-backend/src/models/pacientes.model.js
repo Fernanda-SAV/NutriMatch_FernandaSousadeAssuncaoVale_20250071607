@@ -66,27 +66,13 @@ function vincularPorEmail(nutricionista_id, email_paciente) {
           return reject(e);
         }
 
-        // 1) tenta atualizar vínculo (caso já exista registro em pacientes)
+        // Usar INSERT OR REPLACE para garantir que o vínculo seja criado/atualizado
         db.run(
-          `UPDATE pacientes SET nutricionista_id = ? WHERE usuario_id = ?`,
-          [nutricionista_id, user.id],
+          `INSERT OR REPLACE INTO pacientes (usuario_id, nutricionista_id) VALUES (?, ?)`,
+          [user.id, nutricionista_id],
           function (err2) {
             if (err2) return reject(err2);
-
-            // ✅ se atualizou, ok
-            if (this.changes > 0) {
-              return resolve({ mensagem: 'Paciente vinculado com sucesso!' });
-            }
-
-            // 2) se não existia registro em pacientes, cria agora (UPSERT manual)
-            db.run(
-              `INSERT INTO pacientes (usuario_id, nutricionista_id) VALUES (?, ?)`,
-              [user.id, nutricionista_id],
-              function (err3) {
-                if (err3) return reject(err3);
-                resolve({ mensagem: 'Paciente vinculado com sucesso!' });
-              }
-            );
+            resolve({ mensagem: 'Paciente vinculado com sucesso!' });
           }
         );
       }
@@ -122,14 +108,14 @@ function atualizarPaciente(nutriId, pacienteId, dados) {
 
         const usuarioId = row.usuario_id;
 
-        // Atualizar usuarios
+        // Atualizar usuarios (só peso e altura)
         db.run(
-          `UPDATE usuarios SET nome = ?, email = ?, telefone = ?, nascimento = ?, sexo = ?, peso = ?, altura = ? WHERE id = ?`,
-          [dados.nome, dados.email, dados.telefone, dados.nascimento, dados.sexo, dados.peso, dados.altura, usuarioId],
+          `UPDATE usuarios SET peso = ?, altura = ? WHERE id = ?`,
+          [dados.peso, dados.altura, usuarioId],
           function (err2) {
             if (err2) return reject(err2);
 
-            // Atualizar pacientes
+            // Atualizar pacientes (meta_kcal_diaria)
             db.run(
               `UPDATE pacientes SET meta_kcal_diaria = ? WHERE id = ?`,
               [dados.meta_kcal_diaria, pacienteId],

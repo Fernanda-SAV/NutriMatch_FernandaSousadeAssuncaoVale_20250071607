@@ -56,4 +56,17 @@ async function buscarPlanoDoDia(req, res, next) {
   }
 }
 
-module.exports = { salvarPlano, buscarPlanoDoDia };
+/**
+ * Busca o plano completo do paciente (todos os dias)
+ */
+async function buscarPlanoCompleto(req, res, next) {
+  try {
+    const paciente_id = req.params.paciente_id;
+    const plano = await planoModel.buscarPlanoCompleto(paciente_id);
+    res.json(plano);
+  } catch (e) {
+    next(e);
+  }
+}
+
+module.exports = { salvarPlano, buscarPlanoDoDia, buscarPlanoCompleto };

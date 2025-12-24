@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
+  <header class="login-header">
     <div class="container">
       <nav>
         <a class="brand" href="dashboard_nutri.html">
@@ -15,7 +15,6 @@
         </a>
         <div class="nav-links">
           <a href="dashboard_nutri.html">Meus pacientes</a>
-          <a href="paciente.html">Paciente</a>
           <a href="editar_pacientes.html">Editar pacientes</a>
           <a href="/logout">Sair</a>
         </div>
@@ -172,6 +171,7 @@
   window.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form-vincular');
     if (form) form.addEventListener('submit', vincularPaciente);
+    carregarPacientes(); // Adicionado para carregar a lista ao carregar a página
   });
 
 </script>

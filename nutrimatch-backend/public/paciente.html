@@ -15,7 +15,6 @@
       </a>
       <div class="nav-links">
         <a href="dashboard_nutri.html">Meus pacientes</a>
-        <a href="paciente.html">Paciente</a>
         <a href="editar_pacientes.html">Editar pacientes</a>
         <!-- Sair via rota de logout -->
         <a href="/logout">Sair</a>
@@ -37,13 +36,13 @@
     </div>
   <div class="grid grid-2">
     <section class="card">
-      <h2>Plano alimentar — João Silva</h2>
+      <h2 id="titulo-plano">Plano alimentar</h2>
       <div class="kpis">
-        <div class="kpi"><div>Meta diária</div><strong>1.800 kcal</strong></div>
-        <div class="kpi"><div>Consumido hoje</div><strong>920 kcal</strong></div>
-        <div class="kpi"><div>Restante</div><strong>880 kcal</strong></div>
+        <div class="kpi"><div>Meta diária</div><strong id="meta-diaria">-</strong></div>
+        <div class="kpi"><div>Consumido hoje</div><strong id="consumido-hoje">-</strong></div>
+        <div class="kpi"><div>Restante</div><strong id="restante">-</strong></div>
       </div>
-      <p class="small">Plano: Semanal A • Refeições: café, lanche manhã, almoço, lanche tarde, jantar, ceia</p>
+      <p class="small" id="plano-info">Carregando plano...</p>
     </section>
     <section class="card">
       <h2>Substituições de hoje</h2>
@@ -79,5 +78,63 @@
   <footer class="footer"><div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div></footer>
   <!-- Script centralizado para funcionalidades dinâmicas (futuro) -->
   <script src="js/app.js"></script>
+
+  <script>
+    async function carregarDados() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pacienteId = urlParams.get('paciente_id');
+
+      if (!pacienteId) {
+        alert('Paciente não especificado.');
+        window.history.back();
+        return;
+      }
+
+      try {
+        // Carregar dados do paciente
+        const respPaciente = await fetch(`/api/pacientes/${pacienteId}`);
+        if (!respPaciente.ok) {
+          const erro = await respPaciente.json().catch(() => ({}));
+          alert(erro.mensagem || 'Erro ao carregar paciente.');
+          window.history.back();
+          return;
+        }
+        const dataPaciente = await respPaciente.json();
+        const paciente = dataPaciente.paciente;
+
+        // Atualizar título
+        document.getElementById('titulo-plano').textContent = `Plano alimentar — ${paciente.nome}`;
+
+        // Meta diária
+        document.getElementById('meta-diaria').textContent = paciente.meta_kcal_diaria ? `${paciente.meta_kcal_diaria} kcal` : '-';
+
+        // Carregar plano do dia (hoje)
+        const hoje = new Date().toISOString().slice(0, 10);
+        const respPlano = await fetch(`/api/plano?paciente_id=${pacienteId}&data=${hoje}`);
+        let plano = [];
+        if (respPlano.ok) {
+          plano = await respPlano.json();
+        }
+
+        // Calcular consumido hoje (simulado, pois não temos diário real)
+        let consumido = 0; // Placeholder
+        const restante = paciente.meta_kcal_diaria - consumido;
+
+        document.getElementById('consumido-hoje').textContent = `${consumido} kcal`;
+        document.getElementById('restante').textContent = restante > 0 ? `${restante} kcal` : '0 kcal';
+
+        document.getElementById('plano-info').textContent = `Plano: Diário • Refeições: ${plano.length} cadastradas`;
+
+        // Aqui podemos popular as refeições dinamicamente, mas por enquanto deixamos estático
+
+      } catch (err) {
+        console.error(err);
+        alert('Erro de comunicação com o servidor.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarDados);
+  </script>
+
 </body>
 </html>

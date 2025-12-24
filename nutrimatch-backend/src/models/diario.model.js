@@ -29,4 +29,17 @@ function buscarPorDia(paciente_id, data) {
   });
 }
 
-module.exports = { salvarRegistro, buscarPorDia };
+function buscarCompleto(paciente_id) {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT * FROM diario_refeicoes WHERE paciente_id = ? ORDER BY data DESC, id DESC`,
+      [paciente_id],
+      (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      }
+    );
+  });
+}
+
+module.exports = { salvarRegistro, buscarPorDia, buscarCompleto };

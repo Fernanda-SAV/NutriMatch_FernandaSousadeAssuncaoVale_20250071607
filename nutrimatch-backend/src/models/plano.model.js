@@ -50,4 +50,17 @@ function getPacienteIdByUsuarioId(usuario_id) {
   });
 }
 
-module.exports = { salvarPlano, buscarPlanoDoDia, getPacienteIdByUsuarioId };
+function buscarPlanoCompleto(paciente_id) {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT * FROM planos_refeicoes WHERE paciente_id = ? ORDER BY data DESC, refeicao`,
+      [paciente_id],
+      (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      }
+    );
+  });
+}
+
+module.exports = { salvarPlano, buscarPlanoDoDia, getPacienteIdByUsuarioId, buscarPlanoCompleto };

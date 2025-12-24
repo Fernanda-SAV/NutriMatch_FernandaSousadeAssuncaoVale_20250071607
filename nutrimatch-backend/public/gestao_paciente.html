@@ -91,27 +91,27 @@
       <form class="form-vertical" id="form-dados" onsubmit="return false">
         <div class="campo">
           <label>Nome completo</label>
-          <input id="nome" value="">
+          <input id="nome" readonly value="">
         </div>
 
         <div class="campo">
           <label>E-mail</label>
-          <input id="email" type="email" value="">
+          <input id="email" type="email" readonly value="">
         </div>
 
         <div class="campo">
           <label>Telefone</label>
-          <input id="telefone" type="tel" value="">
+          <input id="telefone" type="tel" readonly value="">
         </div>
 
         <div class="campo">
           <label>Data de nascimento</label>
-          <input id="nascimento" type="date" value="">
+          <input id="nascimento" type="date" readonly value="">
         </div>
 
         <div class="campo">
           <label>Sexo</label>
-          <select id="sexo">
+          <select id="sexo" disabled>
             <option value="">Selecione</option>
             <option value="M">Masculino</option>
             <option value="F">Feminino</option>
@@ -126,7 +126,7 @@
 
         <div class="campo">
           <label>Altura (cm)</label>
-          <input id="altura" type="number" value="">
+          <input id="altura" type="number" readonly value="">
         </div>
 
         <div class="campo">
@@ -150,50 +150,12 @@
         Visão geral das metas por refeição e das opções cadastradas pela nutricionista.
       </p>
 
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Refeição</th>
-            <th>Meta (kcal)</th>
-            <th>Opções cadastradas</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Café da manhã</td>
-            <td>350</td>
-            <td>Iogurte + granola • Omelete • Vitamina de banana</td>
-          </tr>
-          <tr>
-            <td>Lanche da manhã</td>
-            <td>150</td>
-            <td>Banana • Mix de castanhas • Biscoito água e sal</td>
-          </tr>
-          <tr>
-            <td>Almoço</td>
-            <td>600</td>
-            <td>Frango + arroz • Carne moída + purê • Peixe + batata</td>
-          </tr>
-          <tr>
-            <td>Lanche da tarde</td>
-            <td>170</td>
-            <td>Panqueca de banana • Mingau rápido • Maçã + amendoim</td>
-          </tr>
-          <tr>
-            <td>Jantar</td>
-            <td>500</td>
-            <td>Frango grelhado + legumes • Macarrão integral • Omelete completa</td>
-          </tr>
-          <tr>
-            <td>Ceia (opcional)</td>
-            <td>120</td>
-            <td>Leite morno • Iogurte natural • Chá + torradinha</td>
-          </tr>
-        </tbody>
-      </table>
+      <div id="plano-content">
+        <p>Carregando plano...</p>
+      </div>
 
       <div class="actions" style="margin-top:.8rem;">
-        <a class="btn" href="paciente.html">Editar plano alimentar</a>
+        <a id="link-plano" class="btn" href="#">Editar plano alimentar</a>
       </div>
     </section>
 
@@ -204,36 +166,9 @@
         Histórico das refeições que o paciente confirmou no aplicativo.
       </p>
 
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Refeição</th>
-            <th>Receita escolhida</th>
-            <th>Origem</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>10/12/2025</td>
-            <td>Café da manhã</td>
-            <td>Vitamina de banana</td>
-            <td>Plano</td>
-          </tr>
-          <tr>
-            <td>10/12/2025</td>
-            <td>Lanche da tarde</td>
-            <td>Banana assada com aveia (IA)</td>
-            <td>Substituição</td>
-          </tr>
-          <tr>
-            <td>09/12/2025</td>
-            <td>Almoço</td>
-            <td>Frango + arroz + salada</td>
-            <td>Plano</td>
-          </tr>
-        </tbody>
-      </table>
+      <div id="diario-content">
+        <p>Carregando diário...</p>
+      </div>
 
       <p class="small" style="margin-top:.8rem;">
         Em uma versão completa, seria possível filtrar por período e exportar o diário.
@@ -277,6 +212,12 @@
         // Preencher título
         document.getElementById('titulo-paciente').textContent = `Gestão do paciente — ${paciente.nome}`;
 
+        // Definir link do plano
+        const linkPlano = document.getElementById('link-plano');
+        if (linkPlano) {
+          linkPlano.href = `paciente.html?paciente_id=${pacienteId}`;
+        }
+
         // Preencher campos
         document.getElementById('nome').value = paciente.nome || '';
         document.getElementById('email').value = paciente.email || '';
@@ -295,8 +236,112 @@
       }
     }
 
+    async function carregarPlano() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pacienteId = urlParams.get('paciente_id');
+      const content = document.getElementById('plano-content');
+
+      content.innerHTML = '<p>Carregando plano...</p>';
+
+      try {
+        const resp = await fetch(`/api/plano/${pacienteId}`);
+        if (!resp.ok) {
+          content.innerHTML = '<p>Erro ao carregar plano.</p>';
+          return;
+        }
+
+        const planos = await resp.json();
+
+        if (!planos.length) {
+          content.innerHTML = '<p>Nenhum plano cadastrado ainda.</p>';
+          return;
+        }
+
+        // Agrupar por data
+        const grouped = {};
+        planos.forEach(p => {
+          if (!grouped[p.data]) grouped[p.data] = [];
+          grouped[p.data].push(p);
+        });
+
+        let html = '';
+        for (const data in grouped) {
+          html += `<h4>Data: ${data}</h4><table class="table"><thead><tr><th>Refeição</th><th>Meta (kcal)</th><th>Receita Recomendada</th></tr></thead><tbody>`;
+          grouped[data].forEach(p => {
+            html += `<tr><td>${p.refeicao}</td><td>${p.kcal_meta}</td><td>${p.receita_recomendada}</td></tr>`;
+          });
+          html += '</tbody></table>';
+        }
+
+        content.innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        content.innerHTML = '<p>Erro de comunicação.</p>';
+      }
+    }
+
+    async function carregarDiario() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pacienteId = urlParams.get('paciente_id');
+      const content = document.getElementById('diario-content');
+
+      content.innerHTML = '<p>Carregando diário...</p>';
+
+      try {
+        const resp = await fetch(`/api/diario/${pacienteId}`);
+        if (!resp.ok) {
+          content.innerHTML = '<p>Erro ao carregar diário.</p>';
+          return;
+        }
+
+        const registros = await resp.json();
+
+        if (!registros.length) {
+          content.innerHTML = '<p>Nenhum registro no diário ainda.</p>';
+          return;
+        }
+
+        let html = '<table class="table"><thead><tr><th>Data</th><th>Refeição</th><th>Receita</th><th>Kcal</th><th>Origem</th><th>Observação</th></tr></thead><tbody>';
+        registros.forEach(r => {
+          html += `<tr><td>${r.data}</td><td>${r.refeicao}</td><td>${r.receita_nome}</td><td>${r.kcal_consumidas}</td><td>${r.origem}</td><td>${r.observacao || '-'}</td></tr>`;
+        });
+        html += '</tbody></table>';
+
+        content.innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        content.innerHTML = '<p>Erro de comunicação.</p>';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       carregarPaciente();
+
+      // Abas
+      document.querySelectorAll('.aba-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const alvo = e.target.getAttribute('data-alvo');
+
+          // Esconder todas as seções
+          document.querySelectorAll('.gestao-section').forEach(sec => sec.style.display = 'none');
+
+          // Remover classe ativa
+          document.querySelectorAll('.aba-btn').forEach(b => b.classList.remove('aba-ativa'));
+
+          // Mostrar seção alvo
+          document.getElementById(alvo).style.display = 'block';
+          e.target.classList.add('aba-ativa');
+
+          // Carregar conteúdo se necessário
+          if (alvo === 'plano') {
+            carregarPlano();
+          } else if (alvo === 'diario') {
+            carregarDiario();
+          }
+        });
+      });
 
       // Form submit
       document.getElementById('form-dados').addEventListener('submit', async (e) => {
@@ -306,14 +351,9 @@
         const pacienteId = urlParams.get('paciente_id');
 
         const dados = {
-          nome: document.getElementById('nome').value,
-          email: document.getElementById('email').value,
-          telefone: document.getElementById('telefone').value,
-          nascimento: document.getElementById('nascimento').value,
-          sexo: document.getElementById('sexo').value,
           peso: document.getElementById('peso').value,
-          altura: document.getElementById('altura').value,
-          meta_kcal: document.getElementById('meta_kcal').value
+          meta_kcal: document.getElementById('meta_kcal').value,
+          observacoes: document.getElementById('observacoes').value
         };
 
         try {

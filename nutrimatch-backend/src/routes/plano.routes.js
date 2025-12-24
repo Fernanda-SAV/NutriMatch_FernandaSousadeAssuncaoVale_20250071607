@@ -11,4 +11,7 @@ router.post('/api/plano', requireLogin, requireNutri, planoController.salvarPlan
 // Paciente (ou nutri, se você quiser permitir) consulta o plano do dia
 router.get('/api/plano', requireLogin, planoController.buscarPlanoDoDia);
 
+// Buscar plano completo do paciente (para nutricionista)
+router.get('/api/plano/:paciente_id', requireLogin, requireNutri, planoController.buscarPlanoCompleto);
+
 module.exports = router;

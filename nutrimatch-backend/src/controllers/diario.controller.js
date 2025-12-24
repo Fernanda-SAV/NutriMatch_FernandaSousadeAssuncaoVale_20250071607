@@ -72,4 +72,17 @@ async function buscarDiario(req, res, next) {
   }
 }
 
-module.exports = { confirmarRefeicao, buscarDiario };
+/**
+ * Busca o diário completo do paciente (todos os registros)
+ */
+async function buscarDiarioCompleto(req, res, next) {
+  try {
+    const paciente_id = req.params.paciente_id;
+    const registros = await diarioModel.buscarCompleto(paciente_id);
+    res.json(registros);
+  } catch (e) {
+    next(e);
+  }
+}
+
+module.exports = { confirmarRefeicao, buscarDiario, buscarDiarioCompleto };
