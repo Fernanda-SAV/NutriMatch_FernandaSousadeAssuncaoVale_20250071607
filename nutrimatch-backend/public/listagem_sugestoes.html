@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NutriMatch — Sugestões de Substituição</title>
+  <title>NutriMatch — Refeições</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,7 +16,6 @@
           <a href="dashboard_paciente.html">Plano</a>
           <a href="detalhe_receita.html">Receitas</a>
           <a href="perfil.html">👤</a>
-          <!-- Sair via rota de logout -->
           <a href="/logout">Sair</a>
         </div>
       </nav>
@@ -27,180 +26,301 @@
   <div class="container">
 
     <div class="top-actions">
-      <button
-        type="button"
-        class="btn outline btn-back"
-        onclick="window.history.back()"
-      >
-        ← Voltar
-      </button>
+      <button type="button" class="btn outline btn-back" onclick="window.history.back()">← Voltar</button>
     </div>
 
-      <!-- CABEÇALHO DA PÁGINA -->
-      <section class="card">
-        <h2>Substituir refeição</h2>
-        <p class="small">
-          Aqui você pode substituir uma refeição do seu plano por outra opção com calorias semelhantes.
-          Você pode escolher uma receita já cadastrada no banco de dados ou gerar uma nova receita com IA
-          a partir dos ingredientes que tem em casa.
-        </p>
-      </section>
+    <!-- FILTRO -->
+    <section class="card">
+      <h2>Refeições — NutriMatch</h2>
+      <p class="small" id="info-meta">Carregando...</p>
 
-      <!-- FILTRO POR TIPO DE REFEIÇÃO -->
-      <section class="card" style="margin-top:1rem;">
-        <h3>Filtrar por tipo de refeição</h3>
-        <form class="inline" onsubmit="return false">
-          <select name="filtro_refeicao">
-            <option value="">Selecione o tipo de refeição</option>
-            <option value="cafe_manha">Café da manhã</option>
-            <option value="lanche_manha">Lanche da manhã</option>
-            <option value="almoco">Almoço</option>
-            <option value="lanche_tarde">Lanche da tarde</option>
-            <option value="jantar">Jantar</option>
-            <option value="ceia">Ceia (opcional)</option>
-          </select>
-          <a class="btn" href="#sugestoes">Filtrar receitas</a>
-        </form>
-      </section>
+      <form class="inline" id="form-filtro" onsubmit="return false" style="margin-top:.75rem;">
+        <select id="filtro-refeicao">
+          <option value="cafe">Café da manhã</option>
+          <option value="lanche-manha">Lanche da manhã</option>
+          <option value="almoco">Almoço</option>
+          <option value="lanche-tarde">Lanche da tarde</option>
+          <option value="jantar">Jantar</option>
+          <option value="ceia">Ceia</option>
+        </select>
 
-      <!-- BLOCO “TENHO EM CASA” + IA -->
-      <section class="card" style="margin-top:1rem;">
-        <h3>Gerar receita com IA — Tenho em casa</h3>
-        <p class="small">
-          Informe os ingredientes que você tem em casa e o tipo de refeição que deseja. A IA irá sugerir
-          receitas compatíveis com a meta calórica daquela refeição. Cada nova receita gerada será
-          adicionada ao banco de dados para uso futuro.
-        </p>
+        <input id="filtro-meta" type="number" min="1" placeholder="Meta kcal" style="max-width:160px;">
+        <input id="filtro-busca" placeholder="Buscar pelo nome (opcional)" style="min-width:220px;">
 
-        <form class="inline" onsubmit="return false">
-          <input name="ingredientes" placeholder="Ex: banana, ovo, aveia">
+        <button type="button" class="btn outline" id="btn-aplicar">Aplicar</button>
+      </form>
+    </section>
 
-          <select name="refeicao_ia">
-            <option value="">Selecione o tipo de refeição</option>
-            <option value="cafe_manha">Café da manhã (meta 350 kcal)</option>
-            <option value="lanche_manha">Lanche da manhã (meta 150 kcal)</option>
-            <option value="almoco">Almoço (meta 600 kcal)</option>
-            <option value="lanche_tarde">Lanche da tarde (meta 170 kcal)</option>
-            <option value="jantar">Jantar (meta 500 kcal)</option>
-            <option value="ceia">Ceia (meta 120 kcal)</option>
-          </select>
+    <!-- IA -->
+    <section class="card" style="margin-top:1rem;">
+      <h3>Gerar receita com IA — Tenho em casa</h3>
+      <p class="small">
+        Informe ingredientes (separados por vírgula). A receita será gerada para a categoria/meta selecionadas e salva no NutriMatch.
+      </p>
 
-          <!-- No futuro:
-               - "Buscar no banco" chamaria o backend para filtrar receitas existentes.
-               - "Gerar com IA" chamaria a IA para criar receitas novas e gravar no banco.
-          -->
-          <a class="btn" id="btn-buscar-banco" href="#sugestoes">Buscar no banco</a>
-          <a class="btn outline" id="btn-gerar-ia" href="#geradas-ia">Gerar com IA</a>
-        </form>
-      </section>
+      <form class="inline" id="form-ia">
+        <input id="ingredientes-ia" placeholder="Ex: banana, ovo, aveia">
+        <button type="submit" class="btn outline">Gerar com IA</button>
+      </form>
 
-      <!-- SUGESTÕES DO BANCO DE RECEITAS -->
-      <section id="sugestoes" class="section-lista" style="margin-top:2rem;">
-        <h3>Receitas sugeridas do banco de dados</h3>
-        <p class="small">
-          Estas são receitas já cadastradas pela nutricionista ou pelo sistema, compatíveis com a refeição selecionada
-          e com a meta calórica definida no plano.
-        </p>
+      <p class="small" id="ia-status" style="margin-top:.75rem;"></p>
+    </section>
 
-        <div class="grid grid-3">
-          <article class="card">
-            <h4>Panqueca de banana</h4>
-            <p class="small">
-              <strong>Porção:</strong> 1 unidade<br>
-              <strong>Ingredientes:</strong> Banana 60 g • Ovo 45 g • Aveia 15 g<br>
-              <strong>Calorias:</strong> ~170 kcal
-            </p>
-            <div class="actions">
-              <a class="btn" href="confirmacao.html">Usar esta</a>
-              <a class="btn link" href="detalhe_receita.html">Detalhes</a>
-            </div>
-          </article>
+    <!-- LISTA ÚNICA -->
+    <section class="section-lista" style="margin-top:2rem;">
+      <h3>Receitas disponíveis</h3>
+      <p class="small">
+        Resultados da categoria/meta (±10%). Inclui receitas do banco e as geradas por IA.
+      </p>
 
-          <article class="card">
-            <h4>Mingau rápido de aveia</h4>
-            <p class="small">
-              <strong>Porção:</strong> 1 bowl pequeno<br>
-              <strong>Ingredientes:</strong> Aveia 20 g • Leite 150 ml • Banana 40 g<br>
-              <strong>Calorias:</strong> ~165 kcal
-            </p>
-            <div class="actions">
-              <a class="btn" href="confirmacao.html">Usar esta</a>
-              <a class="btn link" href="detalhe_receita.html">Detalhes</a>
-            </div>
-          </article>
+      <div class="grid grid-3" id="cards-receitas">
+        <p class="small">Carregando receitas...</p>
+      </div>
+    </section>
 
-          <article class="card">
-            <h4>Omelete doce</h4>
-            <p class="small">
-              <strong>Porção:</strong> 1 omelete média<br>
-              <strong>Ingredientes:</strong> Ovo 55 g • Banana 50 g<br>
-              <strong>Calorias:</strong> ~172 kcal
-            </p>
-            <div class="actions">
-              <a class="btn" href="confirmacao.html">Usar esta</a>
-              <a class="btn link" href="detalhe_receita.html">Detalhes</a>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- RECEITAS GERADAS POR IA (CONCEITO) -->
-      <section id="geradas-ia" class="section-lista" style="margin-top:2rem;">
-        <h3>Receitas geradas por IA</h3>
-        <p class="small">
-          Exemplos de receitas que poderiam ser geradas automaticamente pela IA com base nos ingredientes informados.
-          A cada nova receita aprovada pelo paciente, ela passa a ser armazenada também no banco de dados.
-        </p>
-
-        <div class="grid grid-3">
-          <article class="card">
-            <h4>Crepioca de banana (IA)</h4>
-            <p class="small">
-              <strong>Porção:</strong> 1 unidade<br>
-              <strong>Ingredientes sugeridos:</strong> Ovo 50 g • Goma de tapioca 25 g • Banana 50 g<br>
-              <strong>Calorias estimadas:</strong> ~180 kcal
-            </p>
-            <div class="actions">
-              <a class="btn" href="confirmacao.html">Usar esta</a>
-              <a class="btn link" href="detalhe_receita.html">Detalhes</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h4>Banana assada com aveia (IA)</h4>
-            <p class="small">
-              <strong>Porção:</strong> 1 ramequim<br>
-              <strong>Ingredientes sugeridos:</strong> Banana 70 g • Aveia 15 g • Canela a gosto<br>
-              <strong>Calorias estimadas:</strong> ~160 kcal
-            </p>
-            <div class="actions">
-              <a class="btn" href="confirmacao.html">Usar esta</a>
-              <a class="btn link" href="detalhe_receita.html">Detalhes</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h4>Ovo mexido com banana (IA)</h4>
-            <p class="small">
-              <strong>Porção:</strong> 1 prato pequeno<br>
-              <strong>Ingredientes sugeridos:</strong> Ovo 45 g • Banana 40 g • Pitada de canela<br>
-              <strong>Calorias estimadas:</strong> ~170 kcal
-            </p>
-            <div class="actions">
-              <a class="btn" href="confirmacao.html">Usar esta</a>
-              <a class="btn link" href="detalhe_receita.html">Detalhes</a>
-            </div>
-          </article>
-        </div>
-      </section>
-
-    </div>
+  </div>
   </main>
 
   <footer class="footer">
     <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
   </footer>
-  <!-- Carrega script global com funções de IA e outras utilidades -->
+
+  <!-- Se seu js/app.js estiver quebrando a página, COMENTE a linha abaixo -->
   <script src="js/app.js"></script>
+
+  <script>
+    const mealNames = {
+      cafe: 'Café da manhã',
+      'lanche-manha': 'Lanche da manhã',
+      almoco: 'Almoço',
+      'lanche-tarde': 'Lanche da tarde',
+      jantar: 'Jantar',
+      ceia: 'Ceia (opcional)'
+    };
+
+    const state = { refeicao: 'cafe', meta: 200, busca: '' };
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function withinRange(kcal, meta, pct = 0.10) {
+      const min = meta * (1 - pct);
+      const max = meta * (1 + pct);
+      return kcal >= min && kcal <= max;
+    }
+
+    function hojeISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function atualizarInfo() {
+      document.getElementById('info-meta').textContent =
+        `Categoria: ${mealNames[state.refeicao] || state.refeicao} • Meta: ${state.meta} kcal`;
+    }
+
+    function cardReceita(r) {
+      const kcalNum = Number(r.kcal_total || 0);
+      const kcalTxt = r.kcal_total != null ? `${Math.round(kcalNum)} kcal` : '-';
+
+      const descFull = String(r.descricao || '');
+      const desc = descFull.slice(0, 140);
+
+      const tagOrigem = (r.origem || 'banco') === 'ia' ? 'IA' : 'NutriMatch';
+
+      const detalheUrl =
+        `detalhe_receita.html?id=${Number(r.id)}&refeicao=${encodeURIComponent(state.refeicao)}&kcal=${encodeURIComponent(state.meta)}`;
+
+      return `
+        <article class="card">
+          <h4>${escapeHtml(r.nome || 'Receita')}</h4>
+          <p class="small">
+            <strong>Calorias:</strong> ${kcalTxt}<br>
+            <strong>Origem:</strong> ${tagOrigem}<br>
+            ${desc ? `<strong>Descrição:</strong> ${escapeHtml(desc)}${descFull.length > 140 ? '...' : ''}` : ''}
+          </p>
+          <div class="actions">
+            <button
+              type="button"
+              class="btn btn-usar"
+              data-id="${Number(r.id)}"
+              data-nome="${escapeHtml(r.nome || '')}"
+              data-kcal="${kcalNum}"
+              data-origem="${escapeHtml(r.origem || 'banco')}"
+            >
+              Usar esta
+            </button>
+
+            <a class="btn link" href="${detalheUrl}">Detalhes</a>
+          </div>
+        </article>
+      `;
+    }
+
+    async function usarReceita(receitaId, receitaNome, kcal, origem) {
+      try {
+        const resp = await fetch('/confirmar-refeicao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            data: hojeISO(),
+            refeicao: state.refeicao,
+            receita_id: receitaId,
+            receita_nome: receitaNome,
+            kcal_consumidas: kcal || state.meta,
+            origem: origem || 'substituicao',
+            observacao: 'Registro feito a partir da listagem_sugestoes'
+          })
+        });
+
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          alert(data.mensagem || `Erro ao registrar. Status ${resp.status}`);
+          return;
+        }
+
+        alert('Registrado no diário!');
+        window.location.href = 'dashboard_paciente.html';
+      } catch (e) {
+        console.error(e);
+        alert('Erro de comunicação.');
+      }
+    }
+
+    async function carregarReceitas() {
+      atualizarInfo();
+
+      const cards = document.getElementById('cards-receitas');
+      cards.innerHTML = `<p class="small">Carregando receitas...</p>`;
+
+      try {
+        const url = `/api/receitas?refeicao=${encodeURIComponent(state.refeicao)}&kcal=${encodeURIComponent(state.meta)}`;
+        const resp = await fetch(url);
+
+        if (!resp.ok) {
+          cards.innerHTML = `<p class="small">Erro ao carregar receitas. Status ${resp.status}</p>`;
+          return;
+        }
+
+        let receitas = await resp.json();
+
+        receitas = (receitas || [])
+          .filter(r => state.meta ? withinRange(Number(r.kcal_total || 0), state.meta, 0.10) : true)
+          .filter(r => state.busca
+            ? String(r.nome || '').toLowerCase().includes(state.busca.toLowerCase())
+            : true
+          );
+
+        if (!receitas.length) {
+          cards.innerHTML = `<p class="small">Nenhuma receita encontrada para esta categoria/meta.</p>`;
+          return;
+        }
+
+        cards.innerHTML = receitas.slice(0, 18).map(cardReceita).join('');
+      } catch (e) {
+        console.error(e);
+        cards.innerHTML = `<p class="small">Erro de comunicação ao carregar receitas.</p>`;
+      }
+    }
+
+    async function gerarComIA(e) {
+      e.preventDefault();
+
+      const status = document.getElementById('ia-status');
+      const inp = document.getElementById('ingredientes-ia');
+      const ingredientes = (inp.value || '').split(',').map(s => s.trim()).filter(Boolean);
+
+      if (!ingredientes.length) return alert('Informe pelo menos 1 ingrediente.');
+
+      status.textContent = 'Gerando receita com IA...';
+
+      try {
+        const resp = await fetch('/api/gerar-receita-ia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ingredientes,
+            kcal_meta: state.meta,
+            refeicao: state.refeicao
+          })
+        });
+
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          status.textContent = data.mensagem || `Erro IA. Status ${resp.status}`;
+          return;
+        }
+
+        status.textContent = 'Receita gerada e salva no NutriMatch ✅';
+        inp.value = '';
+
+        await carregarReceitas();
+      } catch (e) {
+        console.error(e);
+        status.textContent = 'Erro de comunicação com a IA.';
+      }
+    }
+
+    function initFromUrl() {
+      const url = new URL(window.location.href);
+      const r = url.searchParams.get('refeicao');
+      const k = Number(url.searchParams.get('kcal') || 0);
+
+      if (r) state.refeicao = r;
+      if (k > 0) state.meta = k;
+
+      document.getElementById('filtro-refeicao').value = state.refeicao;
+      document.getElementById('filtro-meta').value = state.meta;
+      atualizarInfo();
+    }
+
+    function aplicarFiltro() {
+      const refeicao = document.getElementById('filtro-refeicao').value;
+      const meta = Number(document.getElementById('filtro-meta').value || 0);
+      const busca = document.getElementById('filtro-busca').value || '';
+
+      if (!refeicao) return alert('Selecione a categoria.');
+      if (!meta || meta <= 0) return alert('Informe meta kcal válida.');
+
+      state.refeicao = refeicao;
+      state.meta = meta;
+      state.busca = busca.trim();
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('refeicao', state.refeicao);
+      url.searchParams.set('kcal', String(state.meta));
+      window.history.replaceState({}, '', url.toString());
+
+      carregarReceitas();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initFromUrl();
+
+      // ✅ agora existe e é chamada corretamente
+      carregarReceitas();
+
+      document.getElementById('btn-aplicar').addEventListener('click', aplicarFiltro);
+      document.getElementById('form-ia').addEventListener('submit', gerarComIA);
+
+      // ✅ listener único para “Usar esta” (sem onclick com string)
+      document.getElementById('cards-receitas').addEventListener('click', (ev) => {
+        const btn = ev.target.closest('.btn-usar');
+        if (!btn) return;
+
+        const receitaId = Number(btn.dataset.id);
+        const receitaNome = (btn.dataset.nome || '');
+        const kcal = Number(btn.dataset.kcal || 0);
+        const origem = btn.dataset.origem || 'banco';
+
+        usarReceita(receitaId, receitaNome, kcal, origem);
+      });
+    });
+  </script>
 </body>
 </html>

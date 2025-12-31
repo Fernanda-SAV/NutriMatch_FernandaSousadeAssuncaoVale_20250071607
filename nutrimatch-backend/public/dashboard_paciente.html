@@ -1,219 +1,265 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NutriMatch — Meu Plano</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="login-header">
-    <div class="container">
-      <nav>
-        <a class="brand" href="dashboard_paciente.html">
-          <img src="images/logo.png" alt="Logo NutriMatch">
-        </a>
-        <div class="nav-links">
-          <a href="dashboard_paciente.html">Plano</a>
-          <a href="detalhe_receita.html">Receitas</a>
-          <a href="perfil.html">👤</a>
-          <!-- Sair aciona a rota de logout para encerrar a sessão -->
-          <a href="/logout">Sair</a>
-        </div>
-      </nav>
-    </div>
-  </header>
 
-  <main>
+<header class="login-header">
+  <div class="container">
+    <nav>
+      <a class="brand" href="dashboard_paciente.html">
+        <img src="images/logo.png" alt="Logo NutriMatch">
+      </a>
+      <div class="nav-links">
+        <a href="dashboard_paciente.html">Plano</a>
+        <a href="detalhe_receita.html">Receitas</a>
+        <a href="perfil.html">👤</a>
+        <a href="/logout">Sair</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
   <div class="container">
 
     <div class="top-actions">
-      <button
-        type="button"
-        class="btn outline btn-back"
-        onclick="window.history.back()"
-      >
-        ← Voltar
-      </button>
+      <button type="button" class="btn outline btn-back" onclick="window.history.back()">← Voltar</button>
     </div>
 
-      <!-- RESUMO DO PLANO -->
-      <section class="card">
-        <h2>Meu plano de hoje</h2>
-        <p class="small">
-          Plano cadastrado pela nutricionista, com 3 opções de receita por refeição na mesma faixa de calorias.
-          Selecione a opção que você seguiu e confirme a refeição. Caso não tenha os ingredientes, use o botão
-          <strong>Substituir</strong> para buscar alternativas.
-        </p>
-      </section>
+    <!-- RESUMO -->
+    <section class="card">
+      <h2>Meu plano de hoje</h2>
+      <p class="small">
+        Selecione a receita que você consumiu e confirme a refeição.
+        Caso não tenha os ingredientes, utilize <strong>Substituir</strong>.
+      </p>
+    </section>
 
-      <!-- REFEIÇÕES DO DIA -->
-      <section class="grid grid-3" id="refeicoes-container">
-        <!-- Meals will be loaded dynamically -->
-      </section>
+    <!-- PLANO DO DIA -->
+    <section class="grid grid-3" id="refeicoes-container"></section>
 
-      <!-- DIÁRIO ALIMENTAR (VISÃO PARA NUTRICIONISTA) -->
-      <section class="card" id="diario-alimentar" style="margin-top:2rem;">
-        <h2>Diário alimentar</h2>
-        <p class="small">
-          As refeições confirmadas pelo paciente ao longo dos dias aparecem aqui para o nutricionista acompanhar
-          a adesão ao plano alimentar.
-        </p>
+    <!-- DIÁRIO ALIMENTAR -->
+    <section class="card" style="margin-top:2rem;">
+      <h2>Diário alimentar</h2>
+      <p class="small">
+        As refeições confirmadas aparecem automaticamente após a confirmação.
+      </p>
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Refeição</th>
-              <th>Receita escolhida</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Exemplo estático para o protótipo -->
-            <tr>
-              <td>10/12/2025</td>
-              <td>Café da manhã</td>
-              <td>Vitamina de banana</td>
-              <td>Confirmada</td>
-            </tr>
-            <tr>
-              <td>10/12/2025</td>
-              <td>Almoço</td>
-              <td>Frango + arroz + salada</td>
-              <td>Confirmada</td>
-            </tr>
-            <tr>
-              <td>09/12/2025</td>
-              <td>Lanche da tarde</td>
-              <td>Panqueca de banana</td>
-              <td>Confirmada</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Refeição</th>
+            <th>Receita escolhida</th>
+            <th>Status</th>
+            <th>Ações</th>
 
-    </div>
-  </main>
+          </tr>
+        </thead>
+        <tbody id="diario-body">
+          <tr>
+            <td colspan="4" class="small">Carregando diário...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
-  <footer class="footer">
-    <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
-  </footer>
-  <!-- Script centralizado para funcionalidades dinâmicas (futuro) -->
-  <script src="js/app.js"></script>
+  </div>
+</main>
 
-  <script>
-    async function carregarPlano() {
-      const container = document.getElementById('refeicoes-container');
-      container.innerHTML = '<p>Carregando plano...</p>';
+<footer class="footer">
+  <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
+</footer>
 
-      try {
-        const hoje = new Date().toISOString().slice(0, 10);
-        const resp = await fetch(`/api/plano?data=${hoje}`);
-        if (!resp.ok) {
-          container.innerHTML = '<p>Plano não disponível. Entre em contato com sua nutricionista.</p>';
-          return;
-        }
-        const plano = await resp.json();
+<script src="js/app.js"></script>
 
-        // Group by refeicao
-        const mealsByType = {};
-        plano.forEach(m => {
-          if (!mealsByType[m.refeicao]) mealsByType[m.refeicao] = [];
-          mealsByType[m.refeicao].push(m);
-        });
+<script>
+  const mealTypes = ['cafe', 'lanche-manha', 'almoco', 'lanche-tarde', 'jantar', 'ceia'];
+  const mealNames = {
+    cafe: 'Café da manhã',
+    'lanche-manha': 'Lanche da manhã',
+    almoco: 'Almoço',
+    'lanche-tarde': 'Lanche da tarde',
+    jantar: 'Jantar',
+    ceia: 'Ceia (opcional)'
+  };
 
-        const mealTypes = ['cafe', 'lanche-manha', 'almoco', 'lanche-tarde', 'jantar', 'ceia'];
-        const mealNames = {
-          'cafe': 'Café da manhã',
-          'lanche-manha': 'Lanche da manhã',
-          'almoco': 'Almoço',
-          'lanche-tarde': 'Lanche da tarde',
-          'jantar': 'Jantar',
-          'ceia': 'Ceia (opcional)'
-        };
+  function formatarDataBR(iso) {
+    const [y, m, d] = (iso || '').split('-');
+    return y ? `${d}/${m}/${y}` : '-';
+  }
 
-        container.innerHTML = mealTypes.map(type => {
-          const meals = mealsByType[type] || [];
-          if (meals.length === 0) return '';
+  async function carregarPlano() {
+    const container = document.getElementById('refeicoes-container');
+    container.innerHTML = '<p>Carregando plano...</p>';
 
-          const totalKcal = meals.reduce((sum, m) => sum + m.kcal_meta, 0) / meals.length; // average
-          const recipesHtml = meals.map(m => `
-            <label class="recipe-option">
-              <input type="radio" name="ref_${type}" value="${m.id}">
-              <div class="recipe">
-                <strong>${m.receita_recomendada}</strong>
-                <p class="small">${m.kcal_meta} kcal</p>
-              </div>
-            </label>
-          `).join('');
+    try {
+      const hoje = new Date().toISOString().slice(0, 10);
+      const resp = await fetch(`/api/plano-atual`);
 
-          return `
-            <div class="meal">
-              <h3>${mealNames[type]} • ${Math.round(totalKcal)} kcal</h3>
-              <form class="meal-form" data-refeicao="${type}">
-                <div class="recipes">${recipesHtml}</div>
-                <div class="actions">
-                  <button type="submit" class="btn">Confirmar refeição</button>
-                  <a class="btn outline" href="listagem_sugestoes.html">Substituir</a>
-                </div>
-              </form>
-            </div>
-          `;
-        }).join('');
-
-        if (container.innerHTML.trim() === '') {
-          container.innerHTML = '<p>Nenhuma refeição cadastrada para hoje.</p>';
-        }
-      } catch (err) {
-        console.error(err);
-        container.innerHTML = '<p>Erro ao carregar plano.</p>';
+      if (!resp.ok) {
+        container.innerHTML = '<p>Plano não disponível.</p>';
+        return;
       }
+
+      const plano = await resp.json();
+      const mealsByType = {};
+
+      plano.forEach(m => {
+        if (!mealsByType[m.refeicao]) mealsByType[m.refeicao] = [];
+        mealsByType[m.refeicao].push(m);
+      });
+
+      container.innerHTML = mealTypes.map(type => {
+        const meals = mealsByType[type] || [];
+        if (meals.length === 0) return '';
+
+        const avgKcal = Math.round(
+          meals.reduce((sum, m) => sum + m.kcal_meta, 0) / meals.length
+        );
+
+        const options = meals.map(m => `
+          <label class="recipe-option">
+            <input type="radio" name="ref_${type}" value="${m.id}">
+            <div class="recipe">
+              <strong>${m.receita_recomendada}</strong>
+              <p class="small">${m.kcal_meta} kcal</p>
+            </div>
+          </label>
+        `).join('');
+
+        return `
+          <div class="meal">
+            <h3>${mealNames[type]} • ${avgKcal} kcal</h3>
+            <form class="meal-form" data-refeicao="${type}">
+              <div class="recipes">${options}</div>
+              <div class="actions">
+                <button type="submit" class="btn">Confirmar refeição</button>
+                <a class="btn outline" href="listagem_sugestoes.html?refeicao=${type}&kcal=${avgKcal}">Substituir</a>
+              </div>
+            </form>
+          </div>
+        `;
+      }).join('') || '<p>Nenhuma refeição cadastrada hoje.</p>';
+
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = '<p>Erro ao carregar plano.</p>';
+    }
+  }
+
+  async function excluirEntradaDiario(id) {
+  if (!confirm('Excluir esta entrada do diário?')) return;
+
+  try {
+    const resp = await fetch(`/api/diario/${id}`, { method: 'DELETE' });
+
+
+    if (resp.ok) {
+      await carregarDiario();
+    } else {
+      const data = await resp.json().catch(() => ({}));
+      alert(data.mensagem || `Erro ao excluir. Status ${resp.status}`);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Erro de comunicação ao excluir.');
+  }
+}
+
+
+  async function carregarDiario() {
+    const tbody = document.getElementById('diario-body');
+    const hoje = new Date().toISOString().slice(0, 10);
+
+    try {
+      const resp = await fetch(`/api/plano-atual`);
+
+      if (!resp.ok) {
+        tbody.innerHTML = '<tr><td colspan="4">Erro ao carregar diário.</td></tr>';
+        return;
+      }
+
+      const registros = await resp.json();
+      if (!registros.length) {
+        tbody.innerHTML = '<tr><td colspan="4">Nenhuma refeição confirmada hoje.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = registros.map(r => `
+        <tr>
+          <td>${formatarDataBR(r.data)}</td>
+          <td>${mealNames[r.refeicao] || r.refeicao}</td>
+          <td>${r.receita_nome || '-'}</td>
+          <td>Confirmada</td>
+          <td>
+            <button type="button" class="btn outline" onclick="excluirEntradaDiario(${r.id})">
+              Excluir
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+    } catch (err) {
+      console.error(err);
+      tbody.innerHTML = '<tr><td colspan="4">Erro de comunicação.</td></tr>';
+    }
+  }
+
+  document.addEventListener('submit', async (e) => {
+    if (!e.target.classList.contains('meal-form')) return;
+
+    e.preventDefault();
+    const form = e.target;
+    const refeicao = form.dataset.refeicao;
+    const selected = form.querySelector(`input[name="ref_${refeicao}"]:checked`);
+
+    if (!selected) {
+      alert('Selecione uma receita.');
+      return;
     }
 
-    document.addEventListener('DOMContentLoaded', carregarPlano);
+    const recipeBox = selected.nextElementSibling;
+    const receitaNome = recipeBox.querySelector('strong').textContent;
+    const kcal = parseInt(recipeBox.querySelector('.small').textContent);
 
-    // Handle meal confirmation
-    document.addEventListener('submit', async (e) => {
-      if (e.target.classList.contains('meal-form')) {
-        e.preventDefault();
-        const form = e.target;
-        const refeicao = form.dataset.refeicao;
-        const selectedRadio = form.querySelector(`input[name="ref_${refeicao}"]:checked`);
-        if (!selectedRadio) {
-          alert('Selecione uma receita para confirmar.');
-          return;
-        }
-        const receitaId = selectedRadio.value;
-        const receitaNome = selectedRadio.nextElementSibling.querySelector('strong').textContent;
-        const kcalText = selectedRadio.nextElementSibling.querySelector('.small').textContent;
-        const kcal = parseInt(kcalText);
+    const hoje = new Date().toISOString().slice(0, 10);
 
-        const hoje = new Date().toISOString().slice(0, 10);
+    try {
+      const resp = await fetch('/confirmar-refeicao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: hoje,
+          refeicao,
+          receita_id: selected.value,
+          receita_nome: receitaNome,
+          kcal_consumidas: kcal,
+          origem: 'plano'
+        })
+      });
 
-        try {
-          const resp = await fetch('/confirmar-refeicao', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              data: hoje,
-              refeicao,
-              receita_id: receitaId,
-              receita_nome: receitaNome,
-              kcal_consumidas: kcal,
-              origem: 'plano'
-            })
-          });
-          if (resp.ok) {
-            alert('Refeição confirmada e registrada no diário!');
-            // Optionally reload or update UI
-          } else {
-            alert('Erro ao confirmar refeição.');
-          }
-        } catch (err) {
-          alert('Erro de comunicação.');
-        }
+      if (resp.ok) {
+        alert('Refeição confirmada!');
+        await carregarDiario();
+      } else {
+        alert('Erro ao confirmar refeição.');
       }
-    });
-  </script>
+    } catch {
+      alert('Erro de comunicação.');
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await carregarPlano();
+    await carregarDiario();
+  });
+</script>
+
 </body>
 </html>

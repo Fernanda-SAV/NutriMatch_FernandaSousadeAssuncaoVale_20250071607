@@ -12,5 +12,6 @@ safeUse('pacientes', require('./pacientes.routes'));
 safeUse('plano', require('./plano.routes'));
 safeUse('diario', require('./diario.routes'));
 safeUse('ia', require('./ia.routes'));
+safeUse('alimentos', require('./alimentos.routes'));
 
 module.exports = router;

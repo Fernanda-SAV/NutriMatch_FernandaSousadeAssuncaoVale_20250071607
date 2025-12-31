@@ -90,4 +90,65 @@ function removerRefeicao(id, nutricionista_id) {
   });
 }
 
-module.exports = { salvarPlano, buscarPlanoDoDia, getPacienteIdByUsuarioId, buscarPlanoCompleto, adicionarRefeicao, removerRefeicao };
+function buscarPlanoAtual(paciente_id) {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `
+      SELECT *
+      FROM planos_refeicoes
+      WHERE paciente_id = ?
+        AND data = (
+          SELECT MAX(data)
+          FROM planos_refeicoes
+          WHERE paciente_id = ?
+        )
+      ORDER BY refeicao
+      `,
+      [paciente_id, paciente_id],
+      (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      }
+    );
+  });
+}
+
+function getDataPlanoAtual(paciente_id) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      `SELECT MAX(data) AS data FROM planos_refeicoes WHERE paciente_id = ?`,
+      [paciente_id],
+      (err, row) => {
+        if (err) return reject(err);
+        resolve(row?.data || null);
+      }
+    );
+  });
+}
+
+async function salvarNoPlanoAtual({ nutricionista_id, paciente_id, refeicao, kcal_meta, receita_recomendada }) {
+  const dataAtual = await getDataPlanoAtual(paciente_id);
+  const dataUsar = dataAtual || new Date().toISOString().slice(0, 10);
+
+  return salvarPlano({
+    nutricionista_id,
+    paciente_id,
+    data: dataUsar,
+    refeicao,
+    kcal_meta,
+    receita_recomendada
+  });
+}
+
+
+module.exports = {
+  salvarPlano,
+  buscarPlanoDoDia,
+  buscarPlanoAtual,
+  getDataPlanoAtual, 
+  salvarNoPlanoAtual,// ✅
+  getPacienteIdByUsuarioId,
+  buscarPlanoCompleto,
+  adicionarRefeicao,
+  removerRefeicao
+};

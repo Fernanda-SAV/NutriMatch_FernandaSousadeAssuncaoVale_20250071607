@@ -4,6 +4,19 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NutriMatch — Detalhe da Receita</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .info-box{
+      border: 1px solid #e6e6e6;
+      padding: 1rem;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .muted { opacity: .85; }
+    .row-gap { display: grid; gap: .75rem; }
+    .pill { display:inline-block; padding:.2rem .5rem; border:1px solid #ddd; border-radius:999px; font-size:.85rem; }
+    .select-receita { width: 100%; padding: .6rem .7rem; border-radius: 10px; border: 1px solid #ddd; }
+    .small-break { white-space: pre-wrap; }
+  </style>
 </head>
 <body>
   <header class="login-header">
@@ -16,7 +29,6 @@
           <a href="dashboard_paciente.html">Plano</a>
           <a href="detalhe_receita.html">Receitas</a>
           <a href="perfil.html">👤</a>
-          <!-- Sair via rota de logout -->
           <a href="/logout">Sair</a>
         </div>
       </nav>
@@ -27,106 +39,323 @@
   <div class="container">
 
     <div class="top-actions">
-      <button
-        type="button"
-        class="btn outline btn-back"
-        onclick="window.history.back()"
-      >
-        ← Voltar
-      </button>
+      <button type="button" class="btn outline btn-back" onclick="window.history.back()">← Voltar</button>
     </div>
 
-      <section class="card">
-        <!-- Cabeçalho genérico da receita -->
-        <!-- Cabeçalho genérico da receita -->
-        <header style="margin-bottom:1rem;">
+    <!-- SELETOR -->
+    <section class="card">
+      <h2>Refeições — NutriMatch</h2>
+      <p class="small muted">
+        Selecione uma receita cadastrada para ver os detalhes completos.
+      </p>
 
-          <h2>Nome da receita (ex.: Panqueca de banana)</h2>
+      <div class="row-gap" style="margin-top:.75rem;">
+        <label class="small"><strong>Escolher receita:</strong></label>
+        <select id="select-receita" class="select-receita">
+          <option value="">Carregando receitas...</option>
+        </select>
 
-          <!-- BOX DE INFORMAÇÕES COM CLASSE -->
-          <div class="info-box">
+        <p class="small" id="status-select"></p>
+      </div>
+    </section>
 
-            <p class="small" style="margin-bottom:.5rem;">
-              <strong>Tipo de refeição:</strong> Café da manhã / Lanche / Almoço / Jantar / Ceia
-            </p>
+    <!-- DETALHE -->
+    <section class="card" id="card-detalhe" style="display:none;">
+      <header style="margin-bottom:1rem;">
+        <h2 id="r-nome">—</h2>
 
-            <p class="small" style="margin-bottom:.5rem;">
-              <strong>Meta da refeição:</strong> X kcal • 
-              <strong>Calorias estimadas da receita:</strong> ~Y kcal (±10%)
-            </p>
+        <div class="info-box">
+          <p class="small" style="margin-bottom:.5rem;">
+            <strong>Tipo de refeição:</strong> <span id="r-tipo">-</span>
+            &nbsp; <span class="pill" id="r-origem-pill" style="display:none;"></span>
+          </p>
 
-            <p class="small" style="margin-bottom:.5rem;">
-              <strong>Origem:</strong> Plano da nutricionista • Banco de receitas • Receita gerada por IA
-            </p>
+          <p class="small" style="margin-bottom:.5rem;">
+            <strong>Calorias estimadas:</strong> <span id="r-kcal">-</span>
+            <span id="r-meta-wrap" style="display:none;"> • <strong>Meta (página anterior):</strong> <span id="r-meta">-</span></span>
+          </p>
 
-            <p class="small">
-              As informações abaixo representam a porção ajustada para se encaixar na meta calórica da refeição.
-              Em um sistema completo, esses dados viriam diretamente do banco de dados a partir da receita escolhida.
-            </p>
+          <p class="small" id="r-desc" style="margin:0;"></p>
+        </div>
+      </header>
 
-          </div>
-        </header>
+      <div class="grid grid-2">
+        <!-- INGREDIENTES -->
+        <div>
+          <h3>Ingredientes</h3>
+          <ul id="r-ingredientes">
+            <li class="small">—</li>
+          </ul>
+        </div>
 
+        <!-- PREPARO + AÇÕES -->
+        <div>
+          <h3>Modo de preparo</h3>
+          <ol id="r-preparo">
+            <li class="small">—</li>
+          </ol>
 
+          <p class="small muted" id="r-observacao" style="margin-top:.5rem;"></p>
 
-        <div class="grid grid-2">
+          <div class="actions" style="margin-top:1rem;">
+            <button type="button" class="btn" id="btn-confirmar" style="display:none;">
+              Confirmar substituição
+            </button>
 
-          <!-- Coluna esquerda: porções e ingredientes -->
-          <div>
-            <h3>Porções e ingredientes</h3>
-            <p class="small">
-              <strong>Rendimento:</strong> 1 porção individual (ou X porções)
-            </p>
-
-            <!-- Lista genérica de ingredientes -->
-            <ul>
-              <li>Ingrediente 1: <strong>quantidade + unidade</strong></li>
-              <li>Ingrediente 2: <strong>quantidade + unidade</strong></li>
-              <li>Ingrediente 3: <strong>quantidade + unidade</strong></li>
-              <!-- outros ingredientes... -->
-            </ul>
-
-            <!-- Informações calóricas estimadas -->
-            <p class="small" style="margin-top:.6rem;">
-              <strong>Informação calórica estimada:</strong><br>
-              • Ingrediente 1 ≈ A kcal<br>
-              • Ingrediente 2 ≈ B kcal<br>
-              • Ingrediente 3 ≈ C kcal<br>
-              <strong>Total:</strong> ~Y kcal
-            </p>
-          </div>
-
-          <!-- Coluna direita: modo de preparo + ações -->
-          <div>
-            <h3>Modo de preparo</h3>
-            <ol>
-              <li>Passo 1 da receita (ex.: preparar o ingrediente principal).</li>
-              <li>Passo 2 da receita (ex.: misturar ingredientes líquidos e secos).</li>
-              <li>Passo 3 da receita (ex.: levar ao fogo/forno por X minutos).</li>
-              <li>Passo 4 da receita (opcional: finalização / montagem).</li>
-            </ol>
-
-            <p class="small" style="margin-top:.5rem;">
-              Dica: observações extras podem ser exibidas aqui, como recomendações da nutricionista,
-              orientações de substituição de ingredientes ou cuidados com restrições alimentares.
-            </p>
-
-            <div class="actions" style="margin-top:1rem;">
-              <!-- Confirmar que essa receita será usada como substituição -->
-              <a class="btn" href="confirmacao.html">Confirmar substituição</a>
-
-              <!-- Voltar para a lista de sugestões -->
-              <a class="btn outline" href="listagem_sugestoes.html">Voltar para sugestões</a>
-            </div>
+            <a class="btn outline" id="btn-voltar-sugestoes" href="listagem_sugestoes.html" style="display:none;">
+              Voltar para sugestões
+            </a>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-    </div>
+  </div>
   </main>
 
   <footer class="footer">
     <div class="container">© 2025 NutriMatch • Flexibilidade real no plano alimentar.</div>
   </footer>
+
+<script>
+  const mealNames = {
+    cafe: 'Café da manhã',
+    'lanche-manha': 'Lanche da manhã',
+    almoco: 'Almoço',
+    'lanche-tarde': 'Lanche da tarde',
+    jantar: 'Jantar',
+    ceia: 'Ceia (opcional)'
+  };
+
+  function getParams() {
+    const url = new URL(window.location.href);
+    return {
+      id: url.searchParams.get('id') || '',
+      refeicao: url.searchParams.get('refeicao') || '',
+      kcal: Number(url.searchParams.get('kcal') || 0) || 0
+    };
+  }
+
+  function hojeISO() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function safeParseArray(v) {
+    if (v == null) return [];
+    if (Array.isArray(v)) return v;
+    if (typeof v === 'string') {
+      const s = v.trim();
+      if (!s) return [];
+      // tenta JSON
+      try {
+        const parsed = JSON.parse(s);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+      // fallback: quebra por linha ou vírgula
+      if (s.includes('\n')) return s.split('\n').map(x => x.trim()).filter(Boolean);
+      return s.split(',').map(x => x.trim()).filter(Boolean);
+    }
+    return [String(v)];
+  }
+
+  function setText(id, txt) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt ?? '';
+  }
+
+  function setHtml(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html ?? '';
+  }
+
+  function origemLabel(o) {
+    const v = (o || '').toLowerCase();
+    if (v === 'ia') return 'Gerada por IA';
+    if (v === 'banco') return 'Banco NutriMatch';
+    if (v === 'nutri') return 'Cadastrada pela Nutricionista';
+    return o ? `Origem: ${o}` : '';
+  }
+
+  async function carregarSelectReceitas(preselectId = '') {
+    const select = document.getElementById('select-receita');
+    const status = document.getElementById('status-select');
+
+    try {
+      status.textContent = 'Carregando receitas...';
+      const resp = await fetch('/api/receitas');
+      if (!resp.ok) {
+        select.innerHTML = `<option value="">Erro ao carregar (Status ${resp.status})</option>`;
+        status.textContent = 'Erro ao carregar receitas.';
+        return;
+      }
+
+      const receitas = await resp.json();
+      if (!Array.isArray(receitas) || !receitas.length) {
+        select.innerHTML = `<option value="">Nenhuma receita cadastrada</option>`;
+        status.textContent = 'Nenhuma receita cadastrada ainda.';
+        return;
+      }
+
+      // monta options
+      const opts = receitas.map(r => {
+        const tipo = r.tipo_refeicao ? (mealNames[r.tipo_refeicao] || r.tipo_refeicao) : '—';
+        const kcal = (r.kcal_total != null) ? `${r.kcal_total} kcal` : '-';
+        const nome = r.nome || 'Receita';
+        return `<option value="${Number(r.id)}">${nome} • ${tipo} • ${kcal}</option>`;
+      }).join('');
+
+      select.innerHTML = `<option value="">Selecione uma receita...</option>` + opts;
+
+      // preselect
+      if (preselectId) {
+        const idNum = Number(preselectId);
+        const exists = [...select.options].some(o => Number(o.value) === idNum);
+        if (exists) select.value = String(idNum);
+      }
+
+      status.textContent = '';
+
+    } catch (e) {
+      console.error(e);
+      select.innerHTML = `<option value="">Erro de comunicação</option>`;
+      status.textContent = 'Erro de comunicação ao carregar receitas.';
+    }
+  }
+
+  async function carregarDetalhe(id) {
+    const card = document.getElementById('card-detalhe');
+    if (!id) { card.style.display = 'none'; return; }
+
+    try {
+      const resp = await fetch(`/api/receitas/${Number(id)}`);
+      if (!resp.ok) {
+        card.style.display = 'none';
+        alert(`Erro ao carregar detalhes. Status ${resp.status}`);
+        return;
+      }
+
+      const r = await resp.json();
+
+      const { refeicao, kcal } = getParams();
+
+      // topo
+      setText('r-nome', r.nome || 'Receita');
+      setText('r-tipo', r.tipo_refeicao ? (mealNames[r.tipo_refeicao] || r.tipo_refeicao) : '-');
+      setText('r-kcal', (r.kcal_total != null) ? `${Number(r.kcal_total)} kcal` : '-');
+
+      const pill = document.getElementById('r-origem-pill');
+      const lab = origemLabel(r.origem);
+      if (lab) {
+        pill.style.display = 'inline-block';
+        pill.textContent = lab;
+      } else {
+        pill.style.display = 'none';
+      }
+
+      // meta (se veio da listagem)
+      const metaWrap = document.getElementById('r-meta-wrap');
+      if (refeicao && kcal) {
+        metaWrap.style.display = 'inline';
+        setText('r-meta', `${kcal} kcal (${mealNames[refeicao] || refeicao})`);
+      } else {
+        metaWrap.style.display = 'none';
+      }
+
+      // descrição
+      setText('r-desc', r.descricao ? r.descricao : '');
+
+      // ingredientes
+      const ing = safeParseArray(r.ingredientes);
+      setHtml('r-ingredientes', (ing.length ? ing : ['—']).map(x => `<li>${escapeHtml(x)}</li>`).join(''));
+
+      // preparo
+      const prep = safeParseArray(r.modo_preparo);
+      setHtml('r-preparo', (prep.length ? prep : ['—']).map(x => `<li>${escapeHtml(x)}</li>`).join(''));
+
+      // observação extra (se quiser usar algum campo)
+      const obs = r.observacao || '';
+      setText('r-observacao', obs ? obs : '');
+
+      // botões (se veio da listagem_sugestoes)
+      const btnConfirmar = document.getElementById('btn-confirmar');
+      const btnVoltarSug = document.getElementById('btn-voltar-sugestoes');
+
+      if (refeicao && kcal) {
+        btnConfirmar.style.display = 'inline-block';
+        btnVoltarSug.style.display = 'inline-block';
+        btnVoltarSug.href = `listagem_sugestoes.html?refeicao=${encodeURIComponent(refeicao)}&kcal=${encodeURIComponent(kcal)}`;
+        btnConfirmar.onclick = () => confirmarSubstituicao({ receita: r, refeicao, meta: kcal });
+      } else {
+        btnConfirmar.style.display = 'none';
+        btnVoltarSug.style.display = 'none';
+      }
+
+      card.style.display = 'block';
+
+    } catch (e) {
+      console.error(e);
+      alert('Erro de comunicação ao carregar detalhe.');
+    }
+  }
+
+  async function confirmarSubstituicao({ receita, refeicao, meta }) {
+    try {
+      const resp = await fetch('/confirmar-refeicao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: hojeISO(),
+          refeicao,
+          receita_id: receita.id,
+          receita_nome: receita.nome,
+          kcal_consumidas: Number(receita.kcal_total) || Number(meta),
+          origem: receita.origem || 'substituicao',
+          observacao: 'Substituição escolhida pelo paciente (detalhe_receita)'
+        })
+      });
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        alert(data.mensagem || `Erro ao confirmar. Status ${resp.status}`);
+        return;
+      }
+
+      alert('Substituição registrada no diário!');
+      window.location.href = 'dashboard_paciente.html';
+    } catch (e) {
+      console.error(e);
+      alert('Erro de comunicação ao confirmar substituição.');
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const params = getParams();
+    await carregarSelectReceitas(params.id);
+
+    const select = document.getElementById('select-receita');
+    select.addEventListener('change', async () => {
+      const id = select.value;
+      // atualiza URL sem recarregar
+      const url = new URL(window.location.href);
+      if (id) url.searchParams.set('id', id);
+      else url.searchParams.delete('id');
+      window.history.replaceState({}, '', url.toString());
+
+      await carregarDetalhe(id);
+    });
+
+    // se veio com id, carrega detalhe
+    if (params.id) await carregarDetalhe(params.id);
+  });
+</script>
 </body>
 </html>

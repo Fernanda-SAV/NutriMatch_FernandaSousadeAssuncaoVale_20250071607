@@ -41,10 +41,12 @@
     <nav>
       <a class="brand" href="dashboard_nutri.html">
         <img src="images/logo.png" alt="Logo NutriMatch">
+        <strong>NutriMatch</strong>
       </a>
       <div class="nav-links">
         <a href="dashboard_nutri.html">Meus pacientes</a>
-        <a href="perfil.html">👤</a>
+        <a href="gestao_paciente.html">Gestão do paciente</a>
+        <a href="editar_pacientes.html">Editar pacientes</a>
         <!-- Sair via rota de logout para terminar sessão -->
         <a href="/logout">Sair</a>
       </div>
@@ -153,7 +155,7 @@
       </div>
 
       <div class="actions" style="margin-top:.8rem;">
-        <a id="link-plano" class="btn" href="paciente.html">Editar plano alimentar</a>
+        <a id="link-plano" class="btn" href="#">Editar plano alimentar</a>
       </div>
     </section>
 
@@ -185,7 +187,7 @@
   <script src="js/app.js"></script>
 
   <script>
-    async function carregarPaciente() {
+      async function carregarPaciente() {
       const urlParams = new URLSearchParams(window.location.search);
       const pacienteId = urlParams.get('paciente_id');
 
@@ -196,7 +198,9 @@
       }
 
       try {
+        // ✅ rota correta para dados do paciente
         const resp = await fetch(`/api/pacientes/${pacienteId}`);
+
         if (!resp.ok) {
           const erro = await resp.json().catch(() => ({}));
           alert(erro.mensagem || 'Erro ao carregar paciente.');
@@ -205,18 +209,15 @@
         }
 
         const data = await resp.json();
-        const paciente = data.paciente;
+        const paciente = data.paciente || data; // ✅ suporta os dois formatos
 
-        // Preencher título
-        document.getElementById('titulo-paciente').textContent = `Gestão do paciente — ${paciente.nome}`;
+        document.getElementById('titulo-paciente').textContent =
+          `Gestão do paciente — ${paciente.nome || ''}`;
 
-        // Definir link do plano
         const linkPlano = document.getElementById('link-plano');
-        if (linkPlano) {
-          linkPlano.href = `paciente.html?paciente_id=${pacienteId}&edit=true`;
-        }
+        if (linkPlano) linkPlano.href = `paciente.html?paciente_id=${pacienteId}&edit=true`;
 
-        // Preencher campos
+
         document.getElementById('nome').value = paciente.nome || '';
         document.getElementById('email').value = paciente.email || '';
         document.getElementById('telefone').value = paciente.telefone || '';
@@ -225,7 +226,7 @@
         document.getElementById('peso').value = paciente.peso || '';
         document.getElementById('altura').value = paciente.altura || '';
         document.getElementById('meta_kcal').value = paciente.meta_kcal_diaria || '';
-        document.getElementById('observacoes').value = ''; // Não temos no banco ainda
+        document.getElementById('observacoes').value = paciente.observacoes || '';
 
       } catch (err) {
         console.error(err);
@@ -242,12 +243,12 @@
       content.innerHTML = '<p>Carregando plano...</p>';
 
       try {
-        const resp = await fetch(`/api/plano/${pacienteId}`);
+        const resp = await fetch(`/api/plano-atual/${pacienteId}`);
+
         if (!resp.ok) {
           content.innerHTML = '<p>Erro ao carregar plano.</p>';
           return;
         }
-
         const planos = await resp.json();
 
         if (!planos.length) {
@@ -255,23 +256,20 @@
           return;
         }
 
-        // Agrupar por data
-        const grouped = {};
+        let html = `<table class="table">
+          <thead><tr><th>Refeição</th><th>Meta (kcal)</th><th>Receita Recomendada</th></tr></thead><tbody>`;
+
         planos.forEach(p => {
-          if (!grouped[p.data]) grouped[p.data] = [];
-          grouped[p.data].push(p);
+          html += `<tr>
+            <td>${p.refeicao}</td>
+            <td>${p.kcal_meta}</td>
+            <td>${p.receita_recomendada}</td>
+          </tr>`;
         });
 
-        let html = '';
-        for (const data in grouped) {
-          html += `<h4>Data: ${data}</h4><table class="table"><thead><tr><th>Refeição</th><th>Meta (kcal)</th><th>Receita Recomendada</th></tr></thead><tbody>`;
-          grouped[data].forEach(p => {
-            html += `<tr><td>${p.refeicao}</td><td>${p.kcal_meta}</td><td>${p.receita_recomendada}</td></tr>`;
-          });
-          html += '</tbody></table>';
-        }
-
+        html += `</tbody></table>`;
         content.innerHTML = html;
+
 
       } catch (err) {
         console.error(err);

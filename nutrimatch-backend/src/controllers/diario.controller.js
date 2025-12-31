@@ -72,6 +72,34 @@ async function buscarDiario(req, res, next) {
   }
 }
 
+async function excluirEntrada(req, res) {
+  try {
+    const usuarioId = req.session.usuario_id;
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ mensagem: 'ID inválido.' });
+    }
+
+    const pacienteId = await diarioModel.getPacienteIdByUsuarioId(usuarioId);
+    if (!pacienteId) {
+      return res.status(404).json({ mensagem: 'Paciente não encontrado.' });
+    }
+
+    const changes = await diarioModel.deleteEntradaByIdAndPaciente(id, pacienteId);
+
+    if (changes === 0) {
+      // ou não existe, ou não pertence ao paciente
+      return res.status(404).json({ mensagem: 'Entrada não encontrada.' });
+    }
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ mensagem: 'Erro ao excluir entrada do diário.' });
+  }
+}
+
 /**
  * Busca o diário completo do paciente (todos os registros)
  */
@@ -85,4 +113,4 @@ async function buscarDiarioCompleto(req, res, next) {
   }
 }
 
-module.exports = { confirmarRefeicao, buscarDiario, buscarDiarioCompleto };
+module.exports = { excluirEntrada,confirmarRefeicao, buscarDiario, buscarDiarioCompleto };

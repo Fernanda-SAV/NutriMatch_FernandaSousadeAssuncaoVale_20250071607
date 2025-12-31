@@ -2,7 +2,10 @@ const receitasModel = require('../models/receitas.model');
 
 async function listar(req, res, next) {
   try {
-    const receitas = await receitasModel.listar();
+    const refeicao = (req.query.refeicao || '').trim();
+    const kcal = req.query.kcal ? Number(req.query.kcal) : null;
+
+    const receitas = await receitasModel.listar({ refeicao, kcal });
     res.json(receitas);
   } catch (e) { next(e); }
 }
@@ -17,10 +20,24 @@ async function detalhar(req, res, next) {
 
 async function criar(req, res, next) {
   try {
-    const { nome, descricao, kcal_total } = req.body;
-    if (!nome || !kcal_total) return res.status(400).json({ mensagem: 'Nome e kcal_total são obrigatórios.' });
-    const id = await receitasModel.criar({ nome, descricao, kcal_total });
-    res.status(201).json({ mensagem: 'Receita cadastrada com sucesso!', id });
+    const { nome, descricao, kcal_total, tipo_refeicao, ingredientes, modo_preparo, origem } = req.body;
+
+    if (!nome || !kcal_total) {
+      return res.status(400).json({ mensagem: 'nome e kcal_total são obrigatórios.' });
+    }
+
+    const id = await receitasModel.criar({
+      nome,
+      descricao,
+      kcal_total: Number(kcal_total),
+      tipo_refeicao: tipo_refeicao || null,
+      ingredientes: ingredientes || null,
+      modo_preparo: modo_preparo || null,
+      criado_por: req.session.usuario_id || null,
+      origem: origem || 'banco'
+    });
+
+    res.status(201).json({ mensagem: 'Receita cadastrada!', id });
   } catch (e) { next(e); }
 }
 

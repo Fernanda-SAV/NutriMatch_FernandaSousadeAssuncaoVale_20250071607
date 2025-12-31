@@ -2,6 +2,9 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', 'ia.env') }); // <- carrega sua IA
+require('dotenv').config(); // <- ainda permite usar .env também, se existir
+
 
 const { sessionMiddleware } = require('./config/session');
 const routes = require('./routes');
