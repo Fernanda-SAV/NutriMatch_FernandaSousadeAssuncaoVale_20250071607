@@ -1,165 +1,336 @@
-# NutriMatch — Plataforma Web de Apoio Nutricional
+# 🥗 NutriMatch  
+## Sistema Inteligente de Apoio à Dieta Personalizada
 
-**Autora:** Fernanda Vale  
-**Matrícula:** 20250071607
-
----
-
-## 1. Descrição do Sistema
-O **NutriMatch** é uma aplicação web desenvolvida para auxiliar nutricionistas e pacientes no acompanhamento e na adesão a planos alimentares personalizados. O sistema permite que o nutricionista defina metas calóricas diárias e planos de refeições, enquanto o paciente pode confirmar refeições ou solicitar substituições com base nos ingredientes disponíveis em casa, mantendo-se dentro da meta calórica estabelecida.
-
-A proposta central do sistema é oferecer **flexibilidade alimentar com controle nutricional**, evitando que o paciente abandone a dieta por falta de ingredientes ou inviabilidade de preparo.
+Aplicação web desenvolvida como projeto acadêmico, com foco em acompanhamento nutricional, adesão à dieta e uso de Inteligência Artificial para substituição inteligente de refeições.
 
 ---
 
-## 2. Tecnologias Utilizadas
+## 👩‍💻 Autora
+
+**Fernanda Sousa de Assunção Vale**  
+Matrícula: **20250071607**
+
+---
+
+## 📌 Descrição do Projeto
+
+O **NutriMatch** é uma aplicação web que conecta **nutricionistas** e **pacientes**, permitindo a criação, acompanhamento e adaptação dinâmica de planos alimentares personalizados.
+
+O sistema foi desenvolvido para resolver um problema comum na prática nutricional: a dificuldade do paciente em seguir fielmente o plano alimentar prescrito. Para isso, o NutriMatch oferece mecanismos inteligentes de substituição de refeições, mantendo o equilíbrio nutricional definido pelo profissional.
+
+O grande diferencial do sistema é a integração com **Inteligência Artificial**, que permite gerar receitas personalizadas com base:
+- na categoria da refeição (café da manhã, almoço, etc.);
+- na meta calórica definida pelo nutricionista;
+- nos ingredientes disponíveis informados pelo paciente.
+
+---
+
+## 🎯 Objetivos do Sistema
+
+- Facilitar o acompanhamento nutricional contínuo  
+- Aumentar a adesão do paciente ao plano alimentar  
+- Oferecer flexibilidade sem comprometer metas calóricas  
+- Automatizar tarefas repetitivas do nutricionista  
+- Demonstrar aplicação prática de IA em um sistema real  
+
+---
+
+## 🚀 Funcionalidades Principais
+
+### 🔐 Autenticação e Autorização
+- Cadastro de usuários (paciente ou nutricionista)
+- Login e logout
+- Sessão persistente
+- Controle de acesso por perfil
+- Recuperação de senha
+
+### 🧑‍⚕️ Funcionalidades do Nutricionista
+- Vincular e desvincular pacientes
+- Visualizar e editar dados dos pacientes
+- Criar, editar e remover planos alimentares
+- Definir metas calóricas por refeição
+- Visualizar diário alimentar dos pacientes
+- CRUD completo de receitas
+- Acompanhar adesão ao plano alimentar
+
+### 🧑‍🍳 Funcionalidades do Paciente
+- Visualizar plano alimentar atual
+- Confirmar refeições consumidas
+- Substituir refeições não realizadas por:
+  - receitas do banco (com variação calórica controlada ±10%)
+  - receitas geradas por Inteligência Artificial
+- Informar ingredientes disponíveis
+- Visualizar histórico diário
+- Editar perfil
+
+### 🤖 Inteligência Artificial
+- Geração de receitas personalizadas
+- Respeito à categoria da refeição
+- Aproximação da meta calórica definida
+- Uso exclusivo de ingredientes informados
+- Persistência automática no banco de dados
+- Prevenção de duplicações via hash (`dedupe_key`)
+
+---
+
+## 🛠️ Tecnologias Utilizadas
 
 ### Backend
-- **Node.js** (v18+)
-- **Express.js** (v5)
-- **SQLite3** (persistência de dados)
-- **express-session** (controle de sessão)
+- **Node.js**
+- **Express**
+- **SQLite** (banco de dados relacional)
 - **bcryptjs** (hash de senhas)
-- **OpenAI API** (geração de receitas por IA)
+- **express-session**
+- **Hugging Face Router** (API compatível com OpenAI)
 
 ### Frontend
-- **HTML5**
-- **CSS3**
-- **JavaScript (ES6)**
-- **Fetch API / AJAX**
+- HTML5  
+- CSS3 (design responsivo)  
+- JavaScript (Fetch API)  
+
+### Outros
+- Git & GitHub  
+- SQLite3  
+- Scripts de migração e versionamento de banco  
 
 ---
 
-## 3. Pré-requisitos
-- Node.js instalado
-- NPM ou Yarn
-- Navegador web moderno
-
----
-
-## 4. Instalação
-Clone ou extraia o projeto e, na pasta raiz, execute:
+## 📂 Estrutura do Projeto
 
 ```bash
-npm install
-```
-
----
-
-## 5. Execução do Projeto
-Para iniciar o servidor:
-
-```bash
-node server.js
-```
-
-Acesse no navegador:
-
-```
-http://localhost:3000
-```
-
----
-
-## 6. Estrutura do Projeto
-
-```
 nutrimatch-backend/
-├── server.js          # Servidor Express e rotas
-├── db.js              # Configuração e schema do banco SQLite
-├── nutrimatch.db      # Banco de dados SQLite
 ├── public/
-│   ├── index.html
-│   ├── dashboard_nutri.html
-│   ├── dashboard_paciente.html
-│   ├── listagem_sugestoes.html
-│   ├── detalhe_receita.html
-│   ├── cadastro.html
-│   ├── login_nutri.html
-│   ├── login_paciente.html
 │   ├── css/
-│   │   └── style.css
+│   ├── images/
 │   ├── js/
-│   │   └── app.js
-│   └── images/
-│       └── logo.png
+│   └── *.html
+├── scripts/
+│   ├── init-db.js
+│   ├── migrate-db.js
+│   ├── migrate-lite.js
+│   ├── patch-db.js
+│   └── patch-receitas*.js
+├── src/
+│   ├── config/
+│   ├── controllers/
+│   ├── database/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   └── services/
+├── nutrimatch.db
 ├── package.json
-└── package-lock.json
+├── package-lock.json
+└── README.md
 ```
 
 ---
 
-## 7. Funcionalidades Implementadas
-- Sistema de autenticação (login e logout)
-- Controle de sessão e autorização por tipo de usuário
-- Cadastro e listagem de usuários (paciente e nutricionista)
-- Vinculação de pacientes ao nutricionista
-- Cadastro e listagem de receitas
-- Criação e consulta de plano alimentar diário
-- Confirmação de refeições
-- Diário alimentar do paciente
-- Substituição de refeições
-- Geração de receitas por Inteligência Artificial
+## 🧱 Arquitetura do Sistema
+
+**Padrão adotado:** MVC + API REST
+
+Fluxo geral:
+
+```
+Navegador (Frontend)
+        ↓
+HTML / CSS / JavaScript
+        ↓
+Express (API REST)
+        ↓
+Controllers
+        ↓
+Models
+        ↓
+SQLite (Banco de Dados)
+        ↓
+Integração IA (Hugging Face Router)
+```
+
+A Inteligência Artificial é desacoplada em um **service**, garantindo organização, manutenção e segurança.
 
 ---
 
-## 8. Funcionalidades Fora do Escopo desta Entrega
-- Cálculo nutricional detalhado por macronutrientes
-- Controle de estoque (despensa) do paciente
-- Relatórios estatísticos avançados
-- Exportação de dados em PDF/Excel
+## 🗃️ Modelo de Dados (Descrição)
+
+### Principais Entidades
+
+- **usuarios**
+  - id, nome, email, senha, tipo, dados pessoais
+
+- **pacientes**
+  - id, usuario_id, dados corporais, metas
+
+- **receitas**
+  - id, nome, descrição, kcal_total, tipo_refeicao  
+  - ingredientes, modo_preparo, origem, dedupe_key
+
+- **planos_refeicoes**
+  - id, paciente_id, nutricionista_id  
+  - data, refeicao, kcal_meta, receita_recomendada
+
+- **diario_alimentar**
+  - id, paciente_id, data, refeicao  
+  - kcal_consumida, receita_utilizada
+
+- **alimentos**
+  - nome, kcal_por_100g
+
+> Scripts de criação, migração e patch do banco estão disponíveis na pasta `/scripts`.
 
 ---
 
-## 9. Decisões Técnicas
-O projeto foi desenvolvido como um **MVP acadêmico**, utilizando uma arquitetura **monolítica simples**, onde o backend Express também serve os arquivos estáticos do frontend. Essa decisão reduz a complexidade inicial do projeto e facilita a validação funcional dos requisitos exigidos na disciplina.
-
-A separação completa em camadas (MVC) é considerada uma evolução futura do sistema.
-
----
-
-## 10. Rotas Principais da API
+## 🔌 Documentação da API
 
 ### Autenticação
-- `POST /cadastro`
-- `POST /login`
-- `GET /logout`
-
-### Receitas
-- `POST /receitas`
-- `GET /api/receitas`
+| Método | Endpoint | Descrição |
+|------|---------|----------|
+| POST | /login | Login |
+| POST | /cadastro | Cadastro |
+| GET | /logout | Logout |
+| POST | /forgot-password | Recuperação de senha |
 
 ### Pacientes
-- `POST /vincular-paciente`
-- `GET /api/pacientes`
-- `POST /api/pacientes/:id/desvincular`
+| Método | Endpoint |
+|------|---------|
+| GET | /api/pacientes |
+| GET | /api/pacientes/:id |
+| PUT | /api/pacientes/:id |
+| POST | /vincular-paciente |
+| POST | /api/pacientes/:id/desvincular |
 
 ### Plano Alimentar
-- `POST /api/plano`
-- `GET /api/plano`
+| Método | Endpoint |
+|------|---------|
+| POST | /api/plano |
+| GET | /api/plano |
+| GET | /api/plano/:paciente_id |
+| GET | /api/plano-atual |
+| POST | /api/plano-atual/:paciente_id |
 
 ### Diário Alimentar
-- `POST /confirmar-refeicao`
-- `GET /api/diario`
+| Método | Endpoint |
+|------|---------|
+| POST | /confirmar-refeicao |
+| GET | /api/diario |
+| GET | /api/diario/:paciente_id |
+| DELETE | /api/diario/:id |
+
+### Receitas
+| Método | Endpoint |
+|------|---------|
+| GET | /api/receitas |
+| GET | /api/receitas/:id |
+| POST | /api/receitas |
+| PUT | /api/receitas/:id |
+| DELETE | /api/receitas/:id |
 
 ### Inteligência Artificial
-- `POST /api/gerar-receita-ia`
+| Método | Endpoint |
+|------|---------|
+| POST | /api/gerar-receita-ia |
 
 ---
 
-## 11. Capturas de Tela
--
+## 🔐 Segurança
+
+- Senhas armazenadas com **hash bcrypt**
+- Queries SQL parametrizadas
+- Controle de acesso por perfil
+- Sessões protegidas
+- Variáveis sensíveis fora do repositório
 
 ---
 
-## 12. Dificuldades Encontradas
-- Integração entre frontend e backend com controle de sessão
-- Organização do fluxo de substituição de refeições
-- Definição das regras de geração de receitas por IA
+## ⚙️ Configuração do Ambiente
 
-Essas dificuldades foram resolvidas com validações adicionais, testes manuais e refinamento progressivo da estrutura do código.
+### Pré-requisitos
+- Node.js ≥ 18  
+- npm  
+- Git  
+
+### Arquivo `.env.example`
+
+```env
+PORT=3000
+SESSION_SECRET=sua_chave_secreta
+HF_TOKEN=seu_token_huggingface
+HF_CHAT_MODEL=HuggingFaceTB/SmolLM3-3B:hf-inference
+```
 
 ---
 
-**NutriMatch — Flexibilidade real no plano alimentar.**
+## ▶️ Instalação e Execução
 
+```bash
+git clone https://github.com/seu-usuario/nutrimatch.git
+cd nutrimatch-backend
+npm install
+node scripts/init-db.js
+npm start
+```
+
+Acesse:  
+👉 http://localhost:3000
+
+---
+
+## 🖼️ Capturas de Tela
+
+*(Inserir no mínimo 8 imagens)*
+
+- Tela inicial  
+- Cadastro  
+- Login  
+- Dashboard Nutricionista  
+- Gestão de Paciente  
+- Plano Alimentar  
+- Diário Alimentar  
+- Geração de Receita por IA  
+
+---
+
+## 🎥 Vídeo Demonstrativo
+
+Link do vídeo (YouTube não listado ou Google Drive):  
+👉 **[INSERIR LINK AQUI]**
+
+Duração: 5–8 minutos
+
+---
+
+## 📊 Apresentação
+
+Slides da apresentação (10–15 minutos):  
+👉 **[INSERIR LINK AQUI]**
+
+---
+
+## 🧠 Decisões Técnicas
+
+- SQLite escolhido pela simplicidade e adequação ao escopo acadêmico  
+- Arquitetura MVC para clareza e manutenção  
+- IA desacoplada em service  
+- Frontend servido estaticamente pelo backend  
+
+---
+
+## 🔮 Melhorias Futuras
+
+- Paginação real nas listagens  
+- Relatórios gráficos de adesão  
+- Upload de imagens  
+- Notificações inteligentes  
+- Migração para PostgreSQL  
+- Aplicativo mobile  
+
+---
+
+## ✅ Status do Projeto
+
+✔️ Aplicação funcional  
+✔️ Backend completo  
+✔️ IA integrada  
+✔️ Segurança aplicada  
+✔️ Pronto para avaliação acadêmica
