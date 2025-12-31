@@ -291,19 +291,10 @@ Acesse:
 
 ---
 
-## 🎥 Vídeo Demonstrativo
+## 🎥 Vídeo Demonstrativo e 📊 Apresentação
 
-Link do vídeo (YouTube não listado ou Google Drive):  
-👉 **[INSERIR LINK AQUI]**
-
-Duração: 5–8 minutos
-
----
-
-## 📊 Apresentação
-
-Slides da apresentação (10–15 minutos):  
-👉 **[INSERIR LINK AQUI]**
+Link da pasta com apresentação + video + codigo  
+👉 **[link](https://drive.google.com/drive/folders/1ybPps9y8wFnQ4WeJLpHT_mftgjZFeaMR?usp=sharing)]**
 
 ---
 
