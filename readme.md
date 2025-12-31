@@ -316,6 +316,63 @@ Slides da apresentação (10–15 minutos):
 
 ---
 
+# Configuração de Ambiente — NutriMatch
+
+Este guia explica como configurar o projeto localmente usando variáveis de ambiente.
+
+## 1) Criar o arquivo `.env`
+
+Na raiz do **nutrimatch-backend**, copie o arquivo de exemplo:
+
+- **Windows (PowerShell)**  
+  `Copy-Item .env.example .env`
+
+- **Windows (CMD)**  
+  `copy .env.example .env`
+
+- **Linux/macOS**  
+  `cp .env.example .env`
+
+Depois, abra o `.env` e preencha principalmente:
+
+- `SESSION_SECRET`
+- `HF_TOKEN` (token do Hugging Face)
+- `HF_CHAT_MODEL` (modelo + provider, se quiser alterar)
+
+## 2) Importante sobre `ia.env`
+
+O projeto carrega variáveis tanto de `.env` quanto de `ia.env` (arquivo separado para IA).  
+**Você pode escolher uma das opções abaixo:**
+
+### Opção A (recomendada): usar apenas `.env`
+- Coloque `HF_TOKEN` e `HF_CHAT_MODEL` no `.env`.
+- Mantenha `ia.env` **fora do Git** (no `.gitignore`) ou remova do projeto.
+
+### Opção B: manter `ia.env` (somente local)
+- Mantenha o `HF_TOKEN` dentro de `ia.env` localmente.
+- Garanta que `ia.env` esteja no `.gitignore`.
+- **Nunca** suba `ia.env` com token real para o GitHub.
+
+## 3) Rodar a aplicação
+
+Ainda em `nutrimatch-backend`:
+
+```bash
+npm install
+node scripts/init-db.js
+npm start
+```
+
+Acesse:
+- http://localhost:3000
+
+## 4) Segurança (obrigatório na entrega)
+
+- **Nunca** commitar `.env` e `ia.env`
+- Subir apenas `.env.example` (sem segredos)
+- Rotacionar/revogar token caso ele tenha sido exposto em algum momento
+
+
 ## 🔮 Melhorias Futuras
 
 - Paginação real nas listagens  
@@ -334,3 +391,4 @@ Slides da apresentação (10–15 minutos):
 ✔️ IA integrada  
 ✔️ Segurança aplicada  
 ✔️ Pronto para avaliação acadêmica
+
